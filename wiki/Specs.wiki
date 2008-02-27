@@ -4,6 +4,25 @@
 
 Our objective is to make a installer-> cydia repository conversor and automated repository manager for cydia repositories
 
+= Usage = 
+
+svn co http://debicizer.googlecode.com/svn/trunk/ 
+
+go to scripts and put the xml files of the repo/s you want to convert
+
+cd scripts
+wget modmyifone.com/installer.xml
+wget hhttp://iphone.sleepers.net/repo.xml
+wget http://limitededitioniphone.com/lei.xml
+wget http://apptapp.saurik.com/alpha.xml
+
+goto directory zips and launch debian script for conversion
+
+./debian firstrun installer.xml "ModMyiFone.com""
+./debian firstrun repo.xml "bigboss"
+./debian firstrun lei.xml "bigboss
+./debian firstrun alpha.xml "saurik"
+
 
 = Details =
 
