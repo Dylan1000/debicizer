@@ -13,9 +13,8 @@ echo "editpackage: $0 editpackage packagename MaintainerName MaintainerEmail Cat
 first_run() {
 mkdir -p ../unzipped
 cp -R ../scripts/* ../unzipped/
-for z in *.zip; do unzip -o -qq $z -d ../unzipped/${z}.dir/; done
+for z in *.zip; do unzip -o -qq $z -d ../unzipped/`basename $z .zip`/; done
 cd ../unzipped/
-for x in *.zip.dir; do mv $x `basename $x .zip.dir` ; done
 python control.py
 for x in *; do
 	if [ -d ${x}/__MACOSX ]; then
