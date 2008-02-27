@@ -58,6 +58,10 @@ def get_contact(package):
     
     return " ".join([c for c in contact if c]).strip()
 
+def package_id(package):
+    bundle = package.get('bundleIdentifier')
+    return bundle.lower()
+
 def find_icons(package):
     app_list = glob("%s/Applications/*" % package_name(package))
     icons = []
@@ -236,7 +240,7 @@ REMOVE_PATH = "%s/postrm" % (PACKAGE_DIR)
 
 ICON_PATH = "file:///Applications/%s/icon.png"
 # Holds the mapping between plist keys and control keys
-CONTROL_PLIST_MAP = {'Package' : (package_name, 'N/A'),
+CONTROL_PLIST_MAP = {'Package' : (package_id, 'N/A'),
                      'Name' : ('name', 'N/A'),
                      'Section' : ('category', ''),
                      'Architecture' : (lambda x: 'darwin-arm', ''),
