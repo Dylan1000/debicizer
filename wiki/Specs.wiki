@@ -8,45 +8,10 @@ Our objective is to make a installer-> cydia repository conversor and automated 
 
 svn co http://debicizer.googlecode.com/svn/trunk/ 
 
-go to scripts and put the xml files of the repo/s you want to convert
+go to scripts and put the xml file of your repo, call it installer.xml
 
-cd scripts
+cd zips
 
-wget modmyifone.com/installer.xml
+./debian firstrun installer.xml "Repo Description" (note the quotes)
 
-wget hhttp://iphone.sleepers.net/repo.xml
-
-
-wget http://limitededitioniphone.com/lei.xml
-
-
-wget http://apptapp.saurik.com/alpha.xml
-
-goto directory zips, put the zip files there and launch debian script for conversion
-
-cat < ../scripts/installer.xml | grep http | grep .zip|awk '{gsub("<string>","");gsub("</string>","");print}'| xargs wget
-
-cat < ../scripts/repol | grep http | grep .zip|awk '{gsub("<string>","");gsub("</string>","");print}'| xargs wget
-
-cat < ../scripts/lei.xml | grep http | grep .zip|awk '{gsub("<string>","");gsub("</string>","");print}'| xargs wget
-
-cat < ../scripts/alpha.xml | grep http | grep .zip|awk '{gsub("<string>","");gsub("</string>","");print}'| xargs wget
-
-./debian firstrun installer.xml "ModMyiFone.com"
-
-./debian firstrun repo.xml "bigboss"
-
-./debian firstrun lei.xml "bigboss"
-
-./debian firstrun alpha.xml "saurik"
-
-
-currently generates bronken debs and paths are hardcoded
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+Currently generates broken debs and paths are hardcoded
