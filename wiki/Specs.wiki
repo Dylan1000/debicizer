@@ -41,6 +41,9 @@ cat < ../scripts/alpha.xml | grep http | grep .zip|awk '{gsub("<string>","");gsu
 ./debian firstrun alpha.xml "saurik"
 
 
+currently generates bronken debs and paths are hardcoded
+
+
 = Details =
 
 Add your content here.  Format your content with:
