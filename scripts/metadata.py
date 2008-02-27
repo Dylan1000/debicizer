@@ -5,7 +5,7 @@
 # Uses PListReader developed by Andrew Shearer <awshearer@shearersoftware.com>
 #
 # Created by Lukas Pitschl <lukas@chrisandtheothergirls.com> on 02/07/08
-# Copyright 2008 DRP Dev Team. All Right reserverd.
+# gpl v3
 #
 
 import sys
