@@ -10,6 +10,8 @@ svn co http://debicizer.googlecode.com/svn/trunk/
 
 go to scripts and put the xml file of your repo, call it installer.xml
 
+place all your repo zip files inside zips/
+
 cd zips
 
 ./debian firstrun installer.xml "Repo Description" (note the quotes)
