@@ -87,6 +87,7 @@ def valueForKey(package, plist_key, default="N/A"):
     return value
 
 def createControlFile(package):
+
     """Creates a control file containing the various information, retrieved from the 
     sourcefile for each package.
     
@@ -115,6 +116,45 @@ def createControlFile(package):
         [content.append('%s: %s' % (ctrl_key, val)) for val in value]
     fp.write("\n".join(content))
     fp.close()
+    
+def prepareFiles(package):
+    print "lala"
+    install = PREINSTALL_PATH % package_name(package)
+    fp3 = open(install, "w")
+    print >>fp3, "#!/bin/bash"
+    fp3.close()
+    install1 = POSTINSTALL_PATH % package_name(package)
+    fp4 = open(install1, "w")
+    print >>fp4, "#!/bin/bash"
+    fp4.close()
+    remove = PREREMOVE_PATH % package_name(package)
+    fp5 = open(remove, "w")
+    print >>fp5, "#!/bin/bash"
+    fp5.close()
+    remove1 = POSTREMOVE_PATH % package_name(package)
+    fp6 = open(remove1, "w")
+    print >>fp6, "#!/bin/bash"
+    fp6.close()
+    
+    
+def closeFiles(package):
+    install = PREINSTALL_PATH % package_name(package)
+    fp3 = open(install, "a")
+    print >>fp3, "exit"
+    fp3.close()
+    install1 = POSTINSTALL_PATH % package_name(package)
+    fp4 = open(install1, "a")
+    print >>fp4, "exit"
+    fp4.close()
+    remove = PREREMOVE_PATH % package_name(package)
+    fp5 = open(remove, "a")
+    print >>fp5, "exit"
+    fp5.close()
+    remove1 = POSTREMOVE_PATH % package_name(package)
+    fp6 = open(remove1, "a")
+    print >>fp6, "exit"
+    fp6.close()
+    
 
 def createInstallFiles(package):
     """Creates install and remove files containing the various information, retrieved from the 
@@ -122,6 +162,7 @@ def createInstallFiles(package):
     
     The package variable holds a python dict describing the package
     """
+    global operation
     if  not os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))):
         return
     # Create the directory for the package if it doesn't exist
@@ -133,55 +174,111 @@ def createInstallFiles(package):
     except OSError,a:
 	#print a
         pass
+    
+    
 	#os.makedirs(
     # Creating an empty install file
-    install = INSTALL_PATH % package_name(package)
-    fp3 = open(install, "w")
-    print >>fp3, "#!/bin/bash"
+
     test = valueForKey(package,'scripts')
+    prepareFiles(package)
+    
     if (valueForKey(test,'install')):
-	#print "install"
+	print "install"
+	operation="inst"
+        #install = PREINSTALL_PATH % package_name(package)
+        #fp3 = open(install, "w")
+        #print >>fp3, "#!/bin/bash"
+        #fp3.close()
 	z = valueForKey(test,'install')
-	generateShell(z,fp3,package_name(package),1)
-    print >>fp3, "exit"
-    fp3.close()
-    remove = REMOVE_PATH % package_name(package)
-    fp4 = open(remove, "w")
-    print >>fp4, "#!/bin/bash"
+	generateShell(z,package_name(package),1)
+        #fp3 = open(install, "a")
+        #print >>fp3, "exit"
+        #fp3.close()
+    #remove = PREREMOVE_PATH % package_name(package)
+    #fp4 = open(remove, "w")
+    #print >>fp4, "#!/bin/bash"
     if (valueForKey(test,'uninstall')):
-	#print "uninstall"
+	print "uninstall"
+	operation="rm"
 	k = valueForKey(test,'uninstall')
-	generateShell(k,fp4,package_name(package),1)
-    print >>fp4, "exit"
-    fp4.close()
+	generateShell(k,package_name(package),1)
+    #print >>fp4, "exit"
+    #fp4.close()
+    #closeFiles(package)
  
      
-#               if (valueForKey(test,'uninstall')):
-#                       print "uninstall"
+    #           if (valueForKey(test,'uninstall')):
+     #                  print "uninstall"
                         #print valueForKey(test,'uninstall') 
 #                       k = valueForKey(test,'uninstall')
                         #generateShell(k)
 
 
 
+def isRelative(path):
+    if path.startswith('/'):
+        return False
+    else:
+        return True
+    
 
-
-def generateShell(file,fd,dir,n):
+def generateShell(file,dir,n):
 	#name of the directory of the app 
 	#n is a number to know if is direct or recursive the call
 	#print "es el archivo"# + " ".join(file)
-	#print file
+	print file
 	#print "lalala" 
 	#print dir
 	#print n
 	#dir = package_name(dir)	
+	prefix="pre"
+        archivo=dir + "/DEBIAN/" + prefix + operation
+        print archivo
+        fd = open(archivo, "a")
+        
+	print prefix
+        print operation 
 	for h in file:
-		if h[0] == "CopyPath":
+		if h[0] == "CopyPath": #h[1] origen h[2]destino
+                            #unlockfiles    /usr/bin
+                            #Info.plist     /Applications/MobileAddressBook.app/Info.plist //Contacts.zip
+                                    
 			#print >>fd, "cp -pR \"../" + h[1] + "\" \"" + h[2] + "\""
 			#if
-			print dir
+			if isRelative(h[1]) and os.path.exists(dir + "/" + h[1]) :
+                            print "is relative"
+                            print "me cago en tus muertos"
+			    print "cd " + dir
+			    #print type(h[2])
+			    #[0:file.rfind('.zip')].lower()
+                            if os.path.basename(h[2]) == h[1]:
+                                print "name is in destination path"
+                                print h[2] + " " + h[1]
+                                print "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+                                print "cp -pR \"" + h[1] + "\" \"`pwd`" + h[2] + "\""
+                            else:
+                                print "mkdir -p \"`pwd`" + h[2] + "\""
+                                print "cp -pR \"" + h[1] + "\" \"`pwd`" + h[2] + "/\""	
+                            print "cd .."
+                            
+                            fd.close()
+                            
+                            
+                            #fd.
+                            prefix="post"
+                            archivo=dir + "/DEBIAN/" + prefix + operation
+                            print archivo
+                            #os.system("cat " + POSTINSTALL_PATH % file)
+
+                            fd = open(archivo, "a")
+                            
+                            print type(fd)
+                        else:
+                            print "is absolut"
+                            
+                        print dir
 			print h[1]
-			
+			#print h[1].startswith('/')		
 			if os.path.exists(dir + "/" + h[1]):
 				print "existe el archivo y vamos a moverlo ahora"
 				print dir + "/" + h[1]
@@ -223,7 +320,7 @@ def generateShell(file,fd,dir,n):
                                         print >>fd, "if [ -e \"" + h[1][0][1] +"\" ]; then"
 					temp=h[2]
 					print temp
-					generateShell(temp,fd,dir,0)
+					generateShell(temp,dir,0)
                                 	print >>fd, "fi"
 					#print "es un ExistsPath"
 					#print h[2]
@@ -235,8 +332,10 @@ def generateShell(file,fd,dir,n):
 ARCHITECTUR="darwin-arm"
 PACKAGE_DIR = "./%s/DEBIAN"
 CONTROL_PATH = "%s/control" % (PACKAGE_DIR)
-INSTALL_PATH = "%s/postinst" % (PACKAGE_DIR)
-REMOVE_PATH = "%s/postrm" % (PACKAGE_DIR)
+PREINSTALL_PATH = "%s/preinst" % (PACKAGE_DIR)
+PREREMOVE_PATH = "%s/prerm" % (PACKAGE_DIR)
+POSTINSTALL_PATH = "%s/postinst" % (PACKAGE_DIR)
+POSTREMOVE_PATH = "%s/postrm" % (PACKAGE_DIR)
 
 ICON_PATH = "file:///Applications/%s/icon.png"
 # Holds the mapping between plist keys and control keys
