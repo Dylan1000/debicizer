@@ -3,7 +3,7 @@ TODO
 
 preflight
 
-repair removepath (for uninstall)
+repair removepath (for uninstall) macalc
 
 repair exec
 
