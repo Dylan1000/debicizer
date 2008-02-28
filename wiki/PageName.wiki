@@ -16,6 +16,6 @@ repair if
 ifnot
 
 before add a script in removepath test if it's in the package (cp the files on read maybe?)
-rm -rf "/private/var/root/Library/Preferences/Transit/busguides.db"
+rm -rf "/private/var/root/Library/Preferences/Transit/busguides.db" -DONE
 
 -if fileexist with a list of arguments MACalc-0.1.6.zip- DONE
