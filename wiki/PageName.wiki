@@ -9,7 +9,7 @@ postflight Transit-0.27.04.zip
 
 repair removepath (for uninstall) macalc (flag as copypath in install) - DONE
 
-repair exec
+repair exec - maybe done need test
 
 repair if
 
