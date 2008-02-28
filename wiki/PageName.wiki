@@ -2,6 +2,11 @@ TODO
 
 
 preflight
+
 repair exec
+
 repair if
+
 ifnot
+
+before add a script in removepath test if it's in the package (cp the files on read maybe?)
