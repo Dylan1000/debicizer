@@ -1,13 +1,13 @@
 TODO
 
-activate flag on copy path only in install
+activate flag on copy path only in install - DONE
 
 preflight
 
 
 postflight Transit-0.27.04.zip
 
-repair removepath (for uninstall) macalc (flag as copypath in install)
+repair removepath (for uninstall) macalc (flag as copypath in install) - DONE
 
 repair exec
 
