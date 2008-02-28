@@ -181,7 +181,9 @@ def createInstallFiles(package):
 
     test = valueForKey(package,'scripts')
     prepareFiles(package)
-    
+    global script
+    shellscript = "script.sh"
+    script = open(shellscript, "w")
     if (valueForKey(test,'install')):
 	print "install"
 	operation="inst"
@@ -197,6 +199,9 @@ def createInstallFiles(package):
     #remove = PREREMOVE_PATH % package_name(package)
     #fp4 = open(remove, "w")
     #print >>fp4, "#!/bin/bash"
+    script.close()
+    os.chmod("script.sh",0755) #needs to be octal not decimal
+    os.system("bash script.sh")
     if (valueForKey(test,'uninstall')):
 	print "uninstall"
 	operation="rm"
@@ -237,7 +242,9 @@ def generateShell(file,dir,n):
         fd = open(archivo, "a")
         
 	print prefix
-        print operation 
+        print operation
+        flagForCopyPath=0
+        
 	for h in file:
 		if h[0] == "CopyPath": #h[1] origen h[2]destino
                             #unlockfiles    /usr/bin
@@ -247,32 +254,32 @@ def generateShell(file,dir,n):
 			#if
 			if isRelative(h[1]) and os.path.exists(dir + "/" + h[1]) :
                             print "is relative"
-                            print "me cago en tus muertos"
-			    print "cd " + dir
+                            #print "me cago en tus muertos"
+			    print >>script, "cd " + dir
 			    #print type(h[2])
 			    #[0:file.rfind('.zip')].lower()
                             if os.path.basename(h[2]) == h[1]:
-                                print "name is in destination path"
-                                print h[2] + " " + h[1]
-                                print "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
-                                print "cp -pR \"" + h[1] + "\" \"`pwd`" + h[2] + "\""
+                                #print "name is in destination path"
+                                #print h[2] + " " + h[1]
+                                print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+                                print >>script, "cp -pR \"" + h[1] + "\" \"`pwd`" + h[2] + "\""
                             else:
-                                print "mkdir -p \"`pwd`" + h[2] + "\""
-                                print "cp -pR \"" + h[1] + "\" \"`pwd`" + h[2] + "/\""	
-                            print "cd .."
-                            
-                            fd.close()
+                                print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
+                                print >>script, "cp -pR \"" + h[1] + "\" \"`pwd`" + h[2] + "/\""	
+                            print >>script, "cd .."
+                            flagForCopyPath=1
+                            #fd.close()
                             
                             
                             #fd.
-                            prefix="post"
-                            archivo=dir + "/DEBIAN/" + prefix + operation
-                            print archivo
+                            #prefix="post"
+                            #archivo=dir + "/DEBIAN/" + prefix + operation
+                            #print archivo
                             #os.system("cat " + POSTINSTALL_PATH % file)
 
-                            fd = open(archivo, "a")
+                            #fd = open(archivo, "a")
                             
-                            print type(fd)
+                            #print type(fd)
                         else:
                             print "is absolut"
                             
@@ -298,9 +305,22 @@ def generateShell(file,dir,n):
 			#	print "cd .."
 			#else :
 			#	print >>fd, "cp -pR \"" + h[1] + "\" \"" + h[2] + "\""	
-                elif h[0] == "RemovePath":
+                else:
+                    if flagForCopyPath==1:
+                            fd.close()                                                        
+                            #fd.
+                            prefix="post"
+                            archivo=dir + "/DEBIAN/" + prefix + operation
+                            #print archivo
+                            #os.system("cat " + POSTINSTALL_PATH % file)
+
+                            fd = open(archivo, "a")
+                            flagForCopyPath=0
+                if h[0] == "RemovePath":
                		print >>fd, "rm -rf \"" + h[1] + "\""
+                        #print "borrar " + h[1]
                 elif h[0] == "Exec":
+                        print " ".join(h[1:])
                         print >>fd, " ".join(h[1:])
                 elif h[0] == "SetStatus":
                         print >>fd, "echo " + " ".join(h[1:])
@@ -318,7 +338,9 @@ def generateShell(file,dir,n):
                                 print h[1][0][0]
                                 if h[1][0][0]=="ExistsPath":
                                         print >>fd, "if [ -e \"" + h[1][0][1] +"\" ]; then"
-					temp=h[2]
+                                        #print "test the existance"
+					fd.flush()
+                                        temp=h[2]
 					print temp
 					generateShell(temp,dir,0)
                                 	print >>fd, "fi"
