@@ -3,6 +3,8 @@ TODO
 
 preflight
 
+repair removepath (for uninstall)
+
 repair exec
 
 repair if
