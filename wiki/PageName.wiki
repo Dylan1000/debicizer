@@ -1,5 +1,6 @@
 TODO
 
+activate flag on copy path only in install
 
 preflight
 
