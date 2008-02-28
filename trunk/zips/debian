@@ -15,16 +15,14 @@ mkdir -p ../unzipped
 cp -R ../scripts/* ../unzipped/
 for z in *.zip; do unzip -o -qq $z -d ../unzipped/`basename $z .zip`/; done
 cd ../unzipped/
-python control.py
+python metadata.py
 for x in *; do
 	if [ -d ${x}/__MACOSX ]; then
 		rm -rf ${x}/__MACOSX
 	fi
 	if [ -d ${x}/DEBIAN ]; then
 		echo "" >> ${x}/DEBIAN/control
-		chmod +x ${x}/DEBIAN/control
-		chmod +x ${x}/DEBIAN/postinst
-		chmod +x ${x}/DEBIAN/postrm
+		chmod +x ${x}/DEBIAN/*
 	fi	
 done
 
@@ -62,6 +60,7 @@ Label: $2
 Architecture: darwin-arm
 END
 
+chmod +x mkpgs
 ./mpkgs debs indices/override.stable.main | gzip -9 - -c > dists/stable/main/binary-darwin-arm/Packages.gz
 
 mkdir -p conf
