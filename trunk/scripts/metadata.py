@@ -348,7 +348,6 @@ def generateShell(file,dir,n):
                             #fd.close()
                             
                             script.close()
-                            close
                             os.chmod(shellscript,0755) #needs to be octal not decimal
                             os.system("bash script.sh")
                             script = open(shellscript, "w")
