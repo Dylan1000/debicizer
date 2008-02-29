@@ -501,7 +501,8 @@ packages = plist['packages']
 [createControlFile(p) for p in packages]
 for p in packages:
 	print p
-	#scripts = plist['scripts']
+	print "asasasaa"
+        #scripts = plist['scripts']
 	#print scripts
 	createInstallFiles(p)
 #	if (valueForKey(p,'scripts')):
