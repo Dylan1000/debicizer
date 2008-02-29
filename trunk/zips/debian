@@ -13,7 +13,7 @@ echo "editpackage: $0 editpackage packagename MaintainerName MaintainerEmail Cat
 first_run() {
 mkdir -p ../unzipped
 cp -R ../scripts/* ../unzipped/
-for z in *.zip; do unzip -o -qq $z -d ../unzipped/`basename $z .zip`/; done
+for z in *.zip; do unzip -o -qq $z -d ../unzipped/`basename $z .zip|tr A-Z a-z`/; done
 cd ../unzipped/
 python metadata.py
 for x in *; do
