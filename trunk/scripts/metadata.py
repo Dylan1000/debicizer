@@ -102,7 +102,9 @@ def createControlFile(package):
 	print "existe" + "../zips/" + os.path.basename(valueForKey(package,'location'))	
     try:
         os.makedirs(PACKAGE_DIR % package_name(package))
-    except OSError:
+    except OSError,a:
+        print "esto es una mierda"
+        print a
         pass
     # Creating an empty control file
     control = CONTROL_PATH % package_name(package)
@@ -163,6 +165,7 @@ def createInstallFiles(package):
     The package variable holds a python dict describing the package
     """
     global operation
+    global prefix
     if  not os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))):
         return
     # Create the directory for the package if it doesn't exist
@@ -182,6 +185,7 @@ def createInstallFiles(package):
     test = valueForKey(package,'scripts')
     prepareFiles(package)
     global script
+    global shellscript
     shellscript = "script.sh"
     script = open(shellscript, "w")
     if (valueForKey(test,'install')):
@@ -200,7 +204,7 @@ def createInstallFiles(package):
     #fp4 = open(remove, "w")
     #print >>fp4, "#!/bin/bash"
     script.close()
-    os.chmod("script.sh",0755) #needs to be octal not decimal
+    os.chmod(shellscript,0755) #needs to be octal not decimal
     os.system("bash script.sh")
     if (valueForKey(test,'uninstall')):
 	print "uninstall"
@@ -225,52 +229,123 @@ def isRelative(path):
         return False
     else:
         return True
+    #/bin/mkdir -p /private/var/root/Library/LEI/TTR_Backup||/||b||i
+
+def parseExec(line,dir):
+    global fd
+    global script
+    global shellscript
+    global prefix
+    print "estamos en parseexec"
+    print dir + " es el dir"
+    print type(line)
+    splitedline=line.split()
+    print splitedline
+    if splitedline[0] == "/bin/mkdir":
+        print "es un mkdir"
+        print prefix + operation
+        if splitedline[1][0] == "-":
+            #print "es un argumento"
+            #print "mkdir -p \"`pwd`/" + dir + splitedline[2] +"\""
+            print >>script, "mkdir -p \"`pwd`/" + dir + splitedline[2] +"\""
+            script.close()
+            os.chmod(shellscript,0755) #needs to be octal not decimal
+            #os.system("cat script.sh")
+            os.system("bash script.sh")
+            script = open(shellscript, "w")
+        else:
+            print >>script, "mkdir -p \"`pwd`/" + dir + splitedline[1] +"\""
+            script.close()
+            os.chmod(shellscript,0755) #needs to be octal not decimal
+            #os.system("cat script.sh")
+            os.system("bash script.sh")
+            script = open(shellscript, "w") 
+    elif splitedline[0] == "/bin/mv":
+        if splitedline[1][0] == "-":
+            test=[["MovePath",splitedline[2],splitedline[3]]]
+            generateShell(test,dir,0)
+        else:
+            test=[[u"MovePath",splitedline[1],splitedline[2]]]
+            generateShell(test,dir,0)
+    elif splitedline[0] == "/bin/cp":
+        if splitedline[1][0] == "-":
+            test=[["CopyPath",splitedline[2],splitedline[3]]]
+            generateShell(test,dir,0)
+        else:
+            test=[[u"CopyPath",splitedline[1],splitedline[2]]]
+            generateShell(test,dir,0)
+            
+        
+           
+           
+           
+           
+           
+        
     
+    print "salimos de parseexec"
 
 def generateShell(file,dir,n):
 	#name of the directory of the app 
 	#n is a number to know if is direct or recursive the call
 	#print "es el archivo"# + " ".join(file)
 	print file
+        print dir + "es el puto directorio"
 	#print "lalala" 
 	#print dir
 	#print n
 	#dir = package_name(dir)	
-	prefix="pre"
+	global prefix
+        prefix="pre"
         archivo=dir + "/DEBIAN/" + prefix + operation
         print archivo
+        global fd
+        global script
+        global shellscript
         fd = open(archivo, "a")
         
 	print prefix
         print operation
         flagForCopyPath=0
+        flagForRemovePath=0
         
 	for h in file:
 		if h[0] == "CopyPath": #h[1] origen h[2]destino
                             #unlockfiles    /usr/bin
                             #Info.plist     /Applications/MobileAddressBook.app/Info.plist //Contacts.zip
+                            #Applications/openttd.app /Applications/openttd.app
                                     
 			#print >>fd, "cp -pR \"../" + h[1] + "\" \"" + h[2] + "\""
 			#if
-			if isRelative(h[1]) and os.path.exists(dir + "/" + h[1]) :
+                        
+			if isRelative(h[1]) and os.path.exists(dir + "/" + h[1]):# and operation == "inst":
                             print "is relative"
                             #print "me cago en tus muertos"
 			    print >>script, "cd " + dir
 			    #print type(h[2])
 			    #[0:file.rfind('.zip')].lower()
-                            if os.path.basename(h[2]) == h[1]:
+                            if os.path.basename(h[2]) == os.path.basename(h[1]):
                                 #print "name is in destination path"
                                 #print h[2] + " " + h[1]
+                                print "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+                                print "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
                                 print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
-                                print >>script, "cp -pR \"" + h[1] + "\" \"`pwd`" + h[2] + "\""
-                            else:
-                                print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
-                                print >>script, "cp -pR \"" + h[1] + "\" \"`pwd`" + h[2] + "/\""	
+                                print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
+                            #else:
+                            #    print "mkdir -p \"`pwd`" + h[2] + "\""
+                            #    print "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+                            #    print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
+                            #    print >>script, "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+                                
                             print >>script, "cd .."
-                            flagForCopyPath=1
+                            if operation == "inst":
+                                flagForCopyPath=1
                             #fd.close()
                             
-                            
+                            script.close()
+                            os.chmod(shellscript,0755) #needs to be octal not decimal
+                            os.system("bash script.sh")
+                            script = open(shellscript, "w")
                             #fd.
                             #prefix="post"
                             #archivo=dir + "/DEBIAN/" + prefix + operation
@@ -281,19 +356,22 @@ def generateShell(file,dir,n):
                             
                             #print type(fd)
                         else:
-                            print "is absolut"
                             
-                        print dir
-			print h[1]
+                            print "is absolut or doesn't exist"
+                            print >>fd, "cp -pR \"" + h[1] + "\" \"" + h[2] + "\""
+                            
+                            
+                        #print dir
+			#print h[1]
 			#print h[1].startswith('/')		
-			if os.path.exists(dir + "/" + h[1]):
-				print "existe el archivo y vamos a moverlo ahora"
-				print dir + "/" + h[1]
-				
-			else:
-				print dir + "/" + h[1]
-				print "el archivo no existe asi que pondremos en el archivo que toca"
-				print >>fd, "cp -pR \"" + h[1] + "\" \"" + h[2] + "\""
+			##if os.path.exists(dir + "/" + h[1]):
+			#	print "existe el archivo y vamos a moverlo ahora"
+			#	print dir + "/" + h[1]
+			#	
+			#else:
+			#	print dir + "/" + h[1]
+			#	print "el archivo no existe asi que pondremos en el archivo que toca"
+			##	print >>fd, "cp -pR \"" + h[1] + "\" \"" + h[2] + "\""
  
 			#if n == 1:
 				
@@ -309,19 +387,40 @@ def generateShell(file,dir,n):
                     if flagForCopyPath==1:
                             fd.close()                                                        
                             #fd.
+                            #global prefix
                             prefix="post"
                             archivo=dir + "/DEBIAN/" + prefix + operation
                             #print archivo
                             #os.system("cat " + POSTINSTALL_PATH % file)
-
                             fd = open(archivo, "a")
                             flagForCopyPath=0
                 if h[0] == "RemovePath":
-               		print >>fd, "rm -rf \"" + h[1] + "\""
+                    for j in h:
+                        if j != "RemovePath":
+                            if not os.path.exists(dir + j):
+                               print >>fd, "rm -rf \"" + j + "\""
+                            else:
+                                if operation == "rm":
+                                  flagForRemovePath=1
+                else:
+                    if flagForRemovePath==1:
+                            fd.close()                                                        
+                            #fd.
+                            prefix="post"
+                            archivo=dir + "/DEBIAN/" + prefix + operation
+                            #print archivo
+                            #os.system("cat " + POSTINSTALL_PATH % file)
+                            fd = open(archivo, "a")
+                            flagForRemovePath=0
+                        
                         #print "borrar " + h[1]
-                elif h[0] == "Exec":
-                        print " ".join(h[1:])
-                        print >>fd, " ".join(h[1:])
+                if h[0] == "Exec":
+                    print "".join(h[1]) + " es un exec "
+                    parseExec(h[1],dir)
+                    #if h[1].startswith('/bin/mkdir'):
+                    #    print "es un mkdir"
+                    #print " ".join(h[1:]) + "||" + "".join(h[1][0]) + "||" + "".join(h[1][1])+ "||" + "".join(h[1][2])
+                    #print >>fd, " ".join(h[1:]) 
                 elif h[0] == "SetStatus":
                         print >>fd, "echo " + " ".join(h[1:])
                 elif h[0] == "Notice":
