@@ -15,6 +15,7 @@ import PListReader
 import xml.sax
 from glob import glob
 import types
+
 def plistToPython(file):
     """Creates a python structure from the passed plist file"""
     # parse the file
@@ -450,6 +451,7 @@ def generateShell(file,dir,n):
 
 
 
+print "im running currently"
 ARCHITECTUR="darwin-arm"
 PACKAGE_DIR = "./%s/DEBIAN"
 CONTROL_PATH = "%s/control" % (PACKAGE_DIR)
@@ -475,10 +477,14 @@ if len(sys.argv) > 1:
     sourcefile = sys.argv[1]
 else:
     sourcefile = "./installer.xml"
-    
+
+print sourcefile + " is the file"
 # Converting the source xml (.plist) file into a python structure
 plist = plistToPython(sourcefile)
 # Holds a reference to the repo info
+
+print plist
+print "this is plist"
 repo = plist['info']
 globals()['repo']
 # Holds a reference to the packages list
