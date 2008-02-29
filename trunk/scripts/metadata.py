@@ -489,6 +489,7 @@ repo = plist['info']
 globals()['repo']
 # Holds a reference to the packages list
 packages = plist['packages']
+
 #scripts = plist['scripts']
 #print scripts
 # Looping through the packages an obtaining the information needed.
@@ -499,7 +500,7 @@ packages = plist['packages']
 # The control file will be located under $PACKAGENAME/DEBIAN/control.
 [createControlFile(p) for p in packages]
 for p in packages:
-#	print p
+	print p
 	#scripts = plist['scripts']
 	#print scripts
 	createInstallFiles(p)
