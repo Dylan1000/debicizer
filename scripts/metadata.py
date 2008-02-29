@@ -318,6 +318,9 @@ def generateShell(file,dir,n):
                                     
 			#print >>fd, "cp -pR \"../" + h[1] + "\" \"" + h[2] + "\""
 			#if
+                        if h[1].endswith('/'):
+                            h[1] = h[1][0:-1]
+
                         
 			if isRelative(h[1]) and os.path.exists(dir + "/" + h[1]):# and operation == "inst":
                             print "is relative"
@@ -325,6 +328,7 @@ def generateShell(file,dir,n):
 			    print >>script, "cd " + dir
 			    #print type(h[2])
 			    #[0:file.rfind('.zip')].lower()
+                            print os.path.basename(h[1]) + " el basename"
                             if os.path.basename(h[2]) == os.path.basename(h[1]):
                                 #print "name is in destination path"
                                 #print h[2] + " " + h[1]
@@ -344,6 +348,7 @@ def generateShell(file,dir,n):
                             #fd.close()
                             
                             script.close()
+                            close
                             os.chmod(shellscript,0755) #needs to be octal not decimal
                             os.system("bash script.sh")
                             script = open(shellscript, "w")
@@ -451,7 +456,7 @@ def generateShell(file,dir,n):
 
 
 
-print "im running currently"
+#print "im running currently"
 ARCHITECTUR="darwin-arm"
 PACKAGE_DIR = "./%s/DEBIAN"
 CONTROL_PATH = "%s/control" % (PACKAGE_DIR)
@@ -478,19 +483,19 @@ if len(sys.argv) > 1:
 else:
     sourcefile = "./installer.xml"
 
-print sourcefile + " is the file"
+#print sourcefile + " is the file"
 # Converting the source xml (.plist) file into a python structure
 plist = plistToPython(sourcefile)
 # Holds a reference to the repo info
 
-print plist
-print "this is plist"
+#print plist
+#print "this is plist"
 repo = plist['info']
 globals()['repo']
 # Holds a reference to the packages list
 packages = plist['packages']
-print packages
-print "these are packages"
+#print packages
+#print "these are packages"
 
 #scripts = plist['scripts']
 #print scripts
@@ -502,8 +507,8 @@ print "these are packages"
 # The control file will be located under $PACKAGENAME/DEBIAN/control.
 [createControlFile(p) for p in packages]
 for p in packages:
-	print p
-	print "asasasaa"
+	#print p
+	#print "asasasaa"
         #scripts = plist['scripts']
 	#print scripts
 	createInstallFiles(p)
