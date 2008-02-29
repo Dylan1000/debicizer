@@ -320,6 +320,7 @@ def generateShell(file,dir,n):
 			#if
                         if h[1].endswith('/'):
                             h[1] = h[1][0:-1]
+                        h[2]=h[2].replace( '~', '/var/mobile' )
 
                         
 			if isRelative(h[1]) and os.path.exists(dir + "/" + h[1]):# and operation == "inst":
