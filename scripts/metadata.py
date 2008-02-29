@@ -489,6 +489,8 @@ repo = plist['info']
 globals()['repo']
 # Holds a reference to the packages list
 packages = plist['packages']
+print packages
+print "these are packages"
 
 #scripts = plist['scripts']
 #print scripts
