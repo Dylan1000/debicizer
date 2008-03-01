@@ -25,6 +25,7 @@ def plistToPython(file):
     for key, value in reader.getRecommendedFeatures().items():
         parser.setFeature(key, value)
     parser.setContentHandler(reader)
+    print file
     parser.parse(open(file, 'r'))
     
     return reader.getResult()
