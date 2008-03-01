@@ -23,3 +23,7 @@ Command Lines
 needs to be executed from unzipped dir and it cleans the unzipped folder and reunzip only zip files from the xml and after makes the metadata
 
 sudo find -maxdepth 1 -type d -exec rm -rf {} \; ; python limpiar.py repo.xml ; python metadata.py repo.xml
+
+show all the metadata files before and its name (works before deleting them)
+
+for i in $(ls -1 iradiofix/DEBIAN/*); do echo $i ; cat $i ; done
