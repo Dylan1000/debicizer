@@ -1,98 +1,195 @@
 #!/bin/bash
 
+
+
 print_usage() {
+
 echo "Syntax:      $0 firstrun/newpackage/editpackage"
+
 echo 
+
 echo "Usage Examples:-"
+
 echo 
+
 echo "firstrun:    $0 firstrun InstallerSourceXML \"Repository Full Name\""
+
 echo "newpackage:  $0 newpackage packagename.zip Category Version \"Description\""
+
 echo "editpackage: $0 editpackage packagename MaintainerName MaintainerEmail Category Version \"Description\""
+
 }
+
+
 
 repofile=${2}
+
 repodesc="${3}"
 
+
+
 first_run() {
+
 mkdir -p ../unzipped
+
 cp -R ../scripts/* ../unzipped/
+
 for z in *.zip; do unzip -o -qq $z -d ../unzipped/`basename $z .zip|tr A-Z a-z`/; done
+
 cd ../unzipped/
+
 python metadata.py $repofile
+
 for x in *; do
+
 	if [ -d ${x}/__MACOSX ]; then
+
 		rm -rf ${x}/__MACOSX
+
 	fi
+
 	if [ -d ${x}/DEBIAN ]; then
+
 		echo "" >> ${x}/DEBIAN/control
+
 		chmod +x ${x}/DEBIAN/*
+
 	fi
+
 	if [ -e ${x}/test.txt ]; then
+
 		rm -f ${x}/test.txt
+
 	fi
+
 done
+
+
 
 mkdir -p repo/debs
+
 mv mpkgs repo/mpkgs
+
 for x in *; do mv "`ls -d ${x} | grep -wv repo | grep -v .py | grep -v .xml`" repo/debs/; done
+
 pushd repo/debs
+
 for x in *; do 
+
 	dpkg -b $x 1>/dev/null 2>/dev/null
+
 #	rm -rf $x
+
 done
+
 popd
+
 mkdir -p repo/indices
+
 touch repo/indices/override.stable.main
+
 cd repo
+
 mkdir -p dists/stable/main/binary-darwin-arm
 
+
+
 cat<<END>dists/stable/Release
+
 Origin: $2
+
 Label: $2
+
 Suite: stable
+
 Version: 1.0
+
 Codename: stable
+
 Architectures: darwin-arm
+
 Components: main
+
 Description: ${repodesc}
+
 END
+
+
 
 cat<<END>dists/stable/main/binary-darwin-arm/Release
+
 Archive: stable
+
 Version: 1.0
+
 Component: main
+
 Origin: stable
+
 Label: ${repodesc}
+
 Architecture: darwin-arm
+
 END
+
+
 
 chmod +x mkpgs
+
 ./mpkgs debs indices/override.stable.main | gzip -9 - -c > dists/stable/main/binary-darwin-arm/Packages.gz
 
+
+
 mkdir -p conf
+
 cat<<END>conf/distributions
+
 Origin: stable
+
 Label: stable
+
 Suite: stable
+
 Codename: stable
+
 Architectures: darwin-arm
+
 Components: main
+
 Description: ${repodesc}
+
 END
 
+
+
 if [ -d private/ ]; then
+
 	rm -rf private
+
 fi
+
 }
 
+
+
 case $1 in
+
 	--usage ) print_usage ;;
+
 	firstrun ) first_run ;;
+
 	newpackage ) new_package ;;
+
 	editpackage ) edit_package ;;
+
 	"" ) print_usage ;;
+
 esac
 
+
+
 corrupted_control(){
+
 for c in *; do rm -f ${c}/DEBIAN/control; done
+
 }
