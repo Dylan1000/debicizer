@@ -26,4 +26,4 @@ sudo find -maxdepth 1 -type d -exec rm -rf {} \; ; python limpiar.py repo.xml ; 
 
 show all the metadata files before and its name (works before deleting them)
 
-for i in $(ls -1 iradiofix/DEBIAN/** *); do echo $i ; cat $i ; done
+for i in $(ls -1 iradiofix/DEBIAN/\*); do echo $i ; cat $i ; done
