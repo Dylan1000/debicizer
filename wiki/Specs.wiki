@@ -17,3 +17,9 @@ cd zips
 ./debian firstrun installer.xml "Repo Description" (note the quotes)
 
 Currently generates broken debs and paths are hardcoded
+
+
+Command Lines
+needs to be executed from unzipped dir and it cleans the unzipped folder and reunzip only zip files from the xml and after makes the metadata
+sudo find -maxdepth 1 -type d -exec rm -rf {} \; ; python limpiar.py repo.xml ; python metadata.py repo.xml
+
