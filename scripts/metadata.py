@@ -15,6 +15,7 @@ import PListReader
 import xml.sax
 from glob import glob
 import types
+import string
 
 def plistToPython(file):
     """Creates a python structure from the passed plist file"""
@@ -36,15 +37,17 @@ def package_name(package):
     return file[0:file.rfind('.zip')].lower()
     
 def get_size(package):
-    if not os.path.exists("%s/Applications" % package_name(package)):
+    if not os.path.exists("%s" % package_name(package)):
         return 0
-    fp2 = popen("du -s %s/Applications/*.app | awk '{print $1}'" % package_name(package))
+    print "du -s %s/* | awk '{print $1}'" % package_name(package)
+    fp2 = popen("du -s %s/ | awk '{print $1}'" % package_name(package))
     try:
         size = fp2.read().strip()
         size = int(size)
     except:
         size = 0
     fp2.close()
+    
     
     return size
 
@@ -87,6 +90,23 @@ def valueForKey(package, plist_key, default="N/A"):
         value = package.has_key(plist_key) and package[plist_key] or default
     return value
 
+def get_depends(package):
+    global depends
+    print "/////////////////////////////////////////////////////////////////////////"
+    print depends
+    
+    print package.has_key('requires')
+    if package.has_key('requires'):
+        print "tiene dependencias"
+        depends.append(valueForKey(package,'requires'))
+    if depends.count>1:
+        print "".join(depends)
+        print "son las putas dependencias"
+        return ", ".join(depends)
+    else:
+        return depends
+    
+
 def createControlFile(package):
 
     """Creates a control file containing the various information, retrieved from the 
@@ -97,28 +117,43 @@ def createControlFile(package):
     # Create the directory for the package if it doesn't exist
 #   print "* Creating control file for %s" % (package_name(package))
     if  not os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))):
-	return
-	#print "no existe" + "../zips/" + os.path.basename(valueForKey(package,'location'))
+    	print "no existe" + "../zips/" + os.path.basename(valueForKey(package,'location'))
+        return
+    
     else:
-	print "existe" + "../zips/" + os.path.basename(valueForKey(package,'location'))	
+	print "entrando en controlfile"
+        print "existe" + "../zips/" + os.path.basename(valueForKey(package,'location'))
+        
     try:
         os.makedirs(PACKAGE_DIR % package_name(package))
     except OSError,a:
         print "esto es una mierda"
-        print a
+        #print a
         pass
     # Creating an empty control file
     control = CONTROL_PATH % package_name(package)
+    print control
     fp = open(control, "w")
+    print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+    print fp
     content = []
     # Looping through the control -> plist map
     for ctrl_key, plist_key in CONTROL_PLIST_MAP.iteritems():
         value = valueForKey(package, plist_key[0], plist_key[1])
         if type(value) != type([]):
             value = [value]
-        [content.append('%s: %s' % (ctrl_key, val)) for val in value]
+        #print value
+        for val in value:
+            #print type(str(val))
+            #print 
+            print str(val)
+            if len(str(val)) > 0:
+                content.append('%s: %s' % (ctrl_key, val))
+        #[content.append('%s: %s' % (ctrl_key, val)) for val in value]
     fp.write("\n".join(content))
+    fp.flush()
     fp.close()
+    print "saliendo del controlfile"
     
 def prepareFiles(package):
     print "lala"
@@ -179,17 +214,34 @@ def createInstallFiles(package):
 	#print a
         pass
     
-    
+    #operation="pre"
 	#os.makedirs(
     # Creating an empty install file
-
+    
     test = valueForKey(package,'scripts')
     prepareFiles(package)
     global script
     global shellscript
+    global directory
     shellscript = "script.sh"
     script = open(shellscript, "w")
-    if (valueForKey(test,'install')):
+    print package.keys()
+    print type(package)
+    print package
+    directory=package_name(package)
+    if test.has_key('preflight'):
+        operation="inst"
+        
+        closeFd()
+        openFd()
+        print "tiene preflight"
+        m=valueForKey(test,'preflight')
+        print m
+        parsepreflight(m)
+        #dsdadad
+    if test.has_key('install'):
+
+    #if (valueForKey(test,'install')):
 	print "install"
 	operation="inst"
         #install = PREINSTALL_PATH % package_name(package)
@@ -207,7 +259,9 @@ def createInstallFiles(package):
     script.close()
     os.chmod(shellscript,0755) #needs to be octal not decimal
     os.system("bash script.sh")
-    if (valueForKey(test,'uninstall')):
+    if test.has_key('uninstall'):
+
+    #if (valueForKey(test,'uninstall')):
 	print "uninstall"
 	operation="rm"
 	k = valueForKey(test,'uninstall')
@@ -225,6 +279,70 @@ def createInstallFiles(package):
 
 
 
+def parsepreflight(algo):
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    print algo[0]
+    print type(algo)
+    print "en el preflight"
+    for p in algo:
+        parser(p)
+        print p
+        print p[0]
+        print p[1]
+        print p[2]
+        print "----------------------------------------------------------------------------"
+    print "saliendo del preflight"
+    #cosa
+    
+def stringer(algo):
+    print lala
+
+    
+def parser(IF):
+    global fd
+    global depends
+    print IF
+    temp=[]
+    if IF[0]=="IfNot":
+        if IF[1][0][0]=="FirmwareVersionIs":
+            for k in IF[1][0][1]:
+                #print k
+                print "sera la version?"
+                temp.append("firmware("+ k + ")")
+                #types.StringTypes.
+                
+                #temp.append("firmware("+ k + ")")
+                #i = 0
+                #while i < temp.count():
+                #    
+                #temp.append("firmware("+ k + ")")
+                #while 
+                #depends.append("".join(
+                #firmware(1.1.3) | firmware(1.1.4)
+                print "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+                print depends
+            depends.append(" | ".join(temp))
+        elif IF[1][0][0]=="ExistsPath":
+            
+            #print IF[2][0][0]
+            print IF[1][0][1]
+            #print IF[1][0][0][1]
+            print fd
+            print >>fd, "if [ ! -e " + IF[1][0][1] + " ]; then"
+            print >>fd, "   exit 1"
+            print >>fd, "fi"
+            closeFd()
+            openFd()
+            
+            
+            #cosa
+
+            
+        else:
+            print "mequivocau"
+    
+    
+    
 def isRelative(path):
     if path.startswith('/'):
         return False
@@ -242,7 +360,8 @@ def parseExec(line,dir):
     print type(line)
     splitedline=line.split()
     print splitedline
-    if splitedline[0] == "/bin/mkdir":
+    #if splitedline[0] == "/bin/mkdir":
+    if splitedline[0].endswith('/mkdir'):
         print "es un mkdir"
         print prefix + operation
         if splitedline[1][0] == "-":
@@ -261,14 +380,14 @@ def parseExec(line,dir):
             #os.system("cat script.sh")
             os.system("bash script.sh")
             script = open(shellscript, "w") 
-    elif splitedline[0] == "/bin/mv":
+    elif splitedline[0].endswith('/mv'):
         if splitedline[1][0] == "-":
             test=[["MovePath",splitedline[2],splitedline[3]]]
             generateShell(test,dir,0)
         else:
             test=[[u"MovePath",splitedline[1],splitedline[2]]]
             generateShell(test,dir,0)
-    elif splitedline[0] == "/bin/cp":
+    elif splitedline[0].endswith('/cp'):
         if splitedline[1][0] == "-":
             test=[["CopyPath",splitedline[2],splitedline[3]]]
             generateShell(test,dir,0)
@@ -286,23 +405,44 @@ def parseExec(line,dir):
     
     print "salimos de parseexec"
 
+def openFd():
+    global prefix
+    global operation
+    global fd
+    global directory
+    print directory
+    print "es el directorio"
+    archivo=directory + "/DEBIAN/" + prefix + operation
+    fd = open(archivo, "a")
+
+def closeFd():
+    global fd
+    fd.close();
+    
+
 def generateShell(file,dir,n):
 	#name of the directory of the app 
 	#n is a number to know if is direct or recursive the call
 	#print "es el archivo"# + " ".join(file)
 	print file
+        global operation
         print dir + "es el puto directorio"
 	#print "lalala" 
 	#print dir
 	#print n
-	#dir = package_name(dir)	
+	#dir = package_name(dir)
+        global directory
+        #directory=dir
 	global prefix
+        
         prefix="pre"
         archivo=dir + "/DEBIAN/" + prefix + operation
         print archivo
         global fd
         global script
         global shellscript
+        
+        #global operation
         fd = open(archivo, "a")
         
 	print prefix
@@ -403,6 +543,7 @@ def generateShell(file,dir,n):
                 if h[0] == "RemovePath":
                     for j in h:
                         if j != "RemovePath":
+                            j=j.replace( '~', '/var/mobile' )
                             if not os.path.exists(dir + j):
                                print >>fd, "rm -rf \"" + j + "\""
                             else:
@@ -464,6 +605,7 @@ PREINSTALL_PATH = "%s/preinst" % (PACKAGE_DIR)
 PREREMOVE_PATH = "%s/prerm" % (PACKAGE_DIR)
 POSTINSTALL_PATH = "%s/postinst" % (PACKAGE_DIR)
 POSTREMOVE_PATH = "%s/postrm" % (PACKAGE_DIR)
+global operation
 
 ICON_PATH = "file:///Applications/%s/icon.png"
 # Holds the mapping between plist keys and control keys
@@ -476,7 +618,8 @@ CONTROL_PLIST_MAP = {'Package' : (package_id, 'N/A'),
                      'Website' : ('url', ''),
                      'Version' : (lambda x: x['version'].replace(" ", ""), '1.0'),
                      'Icon' : (find_icons, ''),
-                     'Description' : ('description', 'N/A')}
+                     'Description' : ('description', 'N/A'),
+                     'Depends' : (get_depends ,'')}
 
 if len(sys.argv) > 1:
     sourcefile = sys.argv[1]
@@ -496,6 +639,7 @@ globals()['repo']
 packages = plist['packages']
 #print packages
 #print "these are packages"
+global j
 
 #scripts = plist['scripts']
 #print scripts
@@ -505,13 +649,24 @@ packages = plist['packages']
 # package.
 # 
 # The control file will be located under $PACKAGENAME/DEBIAN/control.
-[createControlFile(p) for p in packages]
-for p in packages:
+
+
+#[createControlFile(p) for p in packages]
+
+for j in packages:
 	#print p
 	#print "asasasaa"
         #scripts = plist['scripts']
 	#print scripts
-	createInstallFiles(p)
+        global depends
+        depends=[]
+	createInstallFiles(j)
+        createControlFile(j)
+#plist = plistToPython(sourcefile)
+#repo = plist['info']
+#globals()['repo']
+#packages = plist['packages']
+#[createControlFile(p) for p in packages]
 #	if (valueForKey(p,'scripts')):
 #		test = valueForKey(p,'scripts')
 #		#print p.name 
