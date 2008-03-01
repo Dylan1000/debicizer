@@ -101,9 +101,14 @@ def get_depends(package):
         print "tiene dependencias"
         depends.append(valueForKey(package,'requires'))
     if depends.count>1:
-        print "".join(depends)
+        checked = [] 
+        for e in depends: 
+            if e not in checked: 
+                checked.append(e) 
+        #return checked
+        print "".join(checked)
         print "son las putas dependencias"
-        return ", ".join(depends)
+        return ", ".join(checked)
     else:
         return depends
     
@@ -334,6 +339,17 @@ def parser(IF):
             print >>fd, "fi"
             closeFd()
             openFd()
+        elif IF[1][0][0]=="InstalledPackage":
+            print IF[1][0]
+            print IF[1][0][1]
+            print IF[1][0][0]
+            if type(IF[1][0][1]) != (types.UnicodeType or types.StringType):
+                for k in IF[1][0][1]:
+                    print "sera el paquete instalado?"
+                    print IF[1][0]
+                    depends.append(k)
+            else:
+                depends.append(IF[1][0][1])
             
             
             #cosa
