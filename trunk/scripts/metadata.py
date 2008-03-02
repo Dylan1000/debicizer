@@ -566,6 +566,8 @@ def generateShell(file,dir,n):
                             else:
                                 if operation == "rm":
                                   flagForRemovePath=1
+                                else:
+                                    print >>fd, "rm -rf \"" + j + "\""
                 else:
                     if flagForRemovePath==1:
                             fd.close()                                                        
