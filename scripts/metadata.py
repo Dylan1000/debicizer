@@ -607,7 +607,11 @@ def generateShell(file,dir,n):
                     #if h[1].startswith('/bin/mkdir'):
                     #    print "es un mkdir"
                     #print " ".join(h[1:]) + "||" + "".join(h[1][0]) + "||" + "".join(h[1][1])+ "||" + "".join(h[1][2])
-                    #print >>fd, " ".join(h[1:]) 
+                    #print >>fd, " ".join(h[1:])
+                elif h[0] == "ExecNoError":
+                    print "".join(h[1]) + " es un execnoerror "
+                    parseExec(h[1],dir)
+                    print >>fd, "true"
                 elif h[0] == "SetStatus":
                         print >>fd, "echo " + " ".join(h[1:])
                 elif h[0] == "Notice":
