@@ -458,7 +458,7 @@ def generateShell(file,dir,n):
         global fd
         global script
         global shellscript
-        
+        global depends        
         #global operation
         fd = open(archivo, "a")
         
@@ -475,9 +475,25 @@ def generateShell(file,dir,n):
                                     
 			#print >>fd, "cp -pR \"../" + h[1] + "\" \"" + h[2] + "\""
 			#if
+                        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
                         if h[1].endswith('/'):
                             h[1] = h[1][0:-1]
-                        h[2]=h[2].replace( '~', '/var/mobile' )
+                        if h[2].endswith('/'):
+                            h[2] = h[2][0:-1]
+                        print h[2]
+                        print h[2].find('~')
+                        if (h[2].find('~')>-1):    
+
+                            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                            h[2]=h[2].replace( '~', '/User' )
+                            depends.append('firmware')
+                        else:
+                            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                            print "is sux"
+                            
+                            
+                        
 
                         
 			if isRelative(h[1]) and os.path.exists(dir + "/" + h[1]):# and operation == "inst":
@@ -494,11 +510,11 @@ def generateShell(file,dir,n):
                                 print "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
                                 print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
                                 print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
-                            #else:
+                            else:
                             #    print "mkdir -p \"`pwd`" + h[2] + "\""
                             #    print "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
-                            #    print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
-                            #    print >>script, "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+                                print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
+                                print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "/\""
                                 
                             print >>script, "cd .."
                             if operation == "inst":
@@ -590,7 +606,7 @@ def generateShell(file,dir,n):
                 elif h[0] == "SetStatus":
                         print >>fd, "echo " + " ".join(h[1:])
                 elif h[0] == "Notice":
-                        print >>fd, "echo " + " ".join(h[1:])
+                        print >>fd, "echo \'" + " ".join(h[1:]) + "\'"
                 elif h[0] == "MovePath":
                         print >>fd, "mv -f \"" + h[1] + "\" \"" + h[2] + "\""
                 elif h[0] == "If":
