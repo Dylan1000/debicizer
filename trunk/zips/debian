@@ -34,7 +34,7 @@ mkdir -p ../unzipped
 
 cp -R ../scripts/* ../unzipped/
 
-for z in *.zip; do unzip -o -qq $z -d ../unzipped/`basename $z .zip|tr A-Z a-z`/; done
+for z in *.zip; do unzip -K -o -qq $z -d ../unzipped/`basename $z .zip|tr A-Z a-z`/; done
 
 cd ../unzipped/
 
