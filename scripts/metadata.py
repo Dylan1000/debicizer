@@ -293,9 +293,9 @@ def parsepreflight(algo):
     print "en el preflight"
     for p in algo:
         parser(p)
-        print p
-        print p[0]
-        print p[1]
+        #print p
+        #print p[0]
+        #print p[1]
         #print p[2]
         print "----------------------------------------------------------------------------"
     print "saliendo del preflight"
