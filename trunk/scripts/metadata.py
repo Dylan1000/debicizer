@@ -208,6 +208,7 @@ def createInstallFiles(package):
     """
     global operation
     global prefix
+    global fd
     if  not os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))):
         return
     # Create the directory for the package if it doesn't exist
@@ -223,7 +224,7 @@ def createInstallFiles(package):
     #operation="pre"
 	#os.makedirs(
     # Creating an empty install file
-    
+    prefix="pre"
     test = valueForKey(package,'scripts')
     prepareFiles(package)
     global script
@@ -237,7 +238,7 @@ def createInstallFiles(package):
     directory=package_name(package)
     if test.has_key('preflight'):
         operation="inst"
-        
+        openFd()
         closeFd()
         openFd()
         print "tiene preflight"
@@ -295,7 +296,7 @@ def parsepreflight(algo):
         print p
         print p[0]
         print p[1]
-        print p[2]
+        #print p[2]
         print "----------------------------------------------------------------------------"
     print "saliendo del preflight"
     #cosa
@@ -374,6 +375,7 @@ def parseExec(line,dir):
     global prefix
     print "estamos en parseexec"
     print dir + " es el dir"
+    print line + " es la linea"
     print type(line)
     splitedline=line.split()
     print splitedline
@@ -411,6 +413,8 @@ def parseExec(line,dir):
         else:
             test=[[u"CopyPath",splitedline[1],splitedline[2]]]
             generateShell(test,dir,0)
+    else:
+        print >>fd, line
             
         
            
@@ -434,7 +438,8 @@ def openFd():
 
 def closeFd():
     global fd
-    fd.close();
+    #print type(fd)
+    fd.close()
     
 
 def generateShell(file,dir,n):
@@ -452,7 +457,7 @@ def generateShell(file,dir,n):
         #directory=dir
 	global prefix
         
-        prefix="pre"
+        
         archivo=dir + "/DEBIAN/" + prefix + operation
         print archivo
         global fd
@@ -694,6 +699,8 @@ for j in packages:
         #scripts = plist['scripts']
 	#print scripts
         global depends
+        global prefix
+        global operation
         depends=[]
 	createInstallFiles(j)
         createControlFile(j)
