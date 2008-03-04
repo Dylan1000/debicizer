@@ -315,7 +315,7 @@ def parser(IF):
             for k in IF[1][0][1]:
                 #print k
                 print "sera la version?"
-                temp.append("firmware("+ k + ")")
+                temp.append("firmware ("+ k + ")")
                 #types.StringTypes.
                 
                 #temp.append("firmware("+ k + ")")
@@ -602,14 +602,20 @@ def generateShell(file,dir,n):
                         
                         #print "borrar " + h[1]
                 if h[0] == "Exec":
-                    print "".join(h[1]) + " es un exec "
+                    #print "vamos a ver el exec"
+                    #print type(h[1])
+                    #print h
+                    #print "".join(h[1]) + " es un exec "
                     parseExec(h[1],dir)
                     #if h[1].startswith('/bin/mkdir'):
                     #    print "es un mkdir"
                     #print " ".join(h[1:]) + "||" + "".join(h[1][0]) + "||" + "".join(h[1][1])+ "||" + "".join(h[1][2])
                     #print >>fd, " ".join(h[1:])
                 elif h[0] == "ExecNoError":
-                    print "".join(h[1]) + " es un execnoerror "
+                    #print "vamos a ver el execnoerror"
+                    #print type(h[1])
+                    #print h
+                    #print "".join(h[1]) + " es un execnoerror "
                     parseExec(h[1],dir)
                     print >>fd, "true"
                 elif h[0] == "SetStatus":
@@ -637,7 +643,8 @@ def generateShell(file,dir,n):
 					#print "es un ExistsPath"
 					#print h[2]
 		else:
-			print h	
+			print h
+                        print " es que no es nada de todo eso"
 
 
 
