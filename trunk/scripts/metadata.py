@@ -298,7 +298,7 @@ def parsepreflight(algo):
         #print p[1]
         #print p[2]
         print "----------------------------------------------------------------------------"
-    print "saliendo del preflight"
+    print "saliendo de preflight"
     #cosa
     
 def stringer(algo):
