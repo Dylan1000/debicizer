@@ -642,7 +642,14 @@ def generateShell(file,dir,n):
                                 	print >>fd, "fi"
 					#print "es un ExistsPath"
 					#print h[2]
-		else:
+		elif h[0] == "InstallApp":
+                    test=[[u"CopyPath",h[1],"/Applications"]]
+                    generateShell(test,dir,0)
+                elif h[0] == "UninstallApp":
+                    #one="/Applications/"+str(h[1])
+                    test=[[u"RemovePath",u"/Applications/"+h[1]]]
+                    generateShell(test,dir,0)
+                else:
 			print h
                         print " es que no es nada de todo eso"
 
