@@ -246,6 +246,10 @@ def createInstallFiles(package):
         print m
         parsepreflight(m)
         #dsdadad
+    script.close()
+    os.chmod(shellscript,0755) #needs to be octal not decimal
+    os.system("bash script.sh")
+    script = open(shellscript, "w")
     if test.has_key('install'):
 
     #if (valueForKey(test,'install')):
@@ -256,7 +260,7 @@ def createInstallFiles(package):
         #print >>fp3, "#!/bin/bash"
         #fp3.close()
 	z = valueForKey(test,'install')
-	generateShell(z,package_name(package),1)
+	generateShell(z,package_name(package),0)
         #fp3 = open(install, "a")
         #print >>fp3, "exit"
         #fp3.close()
@@ -266,13 +270,14 @@ def createInstallFiles(package):
     script.close()
     os.chmod(shellscript,0755) #needs to be octal not decimal
     os.system("bash script.sh")
+    script = open(shellscript, "w")
     if test.has_key('uninstall'):
 
     #if (valueForKey(test,'uninstall')):
 	print "uninstall"
 	operation="rm"
 	k = valueForKey(test,'uninstall')
-	generateShell(k,package_name(package),1)
+	generateShell(k,package_name(package),0)
     #print >>fp4, "exit"
     #fp4.close()
     #closeFiles(package)
@@ -473,6 +478,7 @@ def generateShell(file,dir,n):
         flagForRemovePath=0
         
 	for h in file:
+
 		if h[0] == "CopyPath": #h[1] origen h[2]destino
                             #unlockfiles    /usr/bin
                             #Info.plist     /Applications/MobileAddressBook.app/Info.plist //Contacts.zip
