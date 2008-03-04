@@ -493,6 +493,9 @@ def generateShell(file,dir,n):
                             print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                             h[2]=h[2].replace( '~', '/User' )
                             depends.append('firmware')
+                        elif (h[2].find('/var/mobile')>-1):
+                            h[2]=h[2].replace( '/var/mobile', '/User' )
+                            depends.append('firmware')
                         else:
                             print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                             print "is sux"
