@@ -129,7 +129,9 @@ def createControlFile(package):
     else:
 	print "entrando en controlfile"
         print "existe" + "../zips/" + os.path.basename(valueForKey(package,'location'))
-        
+    if not package.has_key('uninstall'):
+        print "doesnt have uninstall script i hate the maintainer!"
+        return   
     try:
         os.makedirs(PACKAGE_DIR % package_name(package))
     except OSError,a:
@@ -215,11 +217,15 @@ def createInstallFiles(package):
     #print package
     #print "* Creating install and remove files for %s" % (package_name(package))
     #print package_name(package)
+    if not package.has_key('uninstall'):
+        print "doesnt have uninstall script i hate the maintainer!"
+        return
     try:
         os.makedirs(PACKAGE_DIR % package_name(package))
     except OSError,a:
 	#print a
         pass
+
     
     #operation="pre"
 	#os.makedirs(
