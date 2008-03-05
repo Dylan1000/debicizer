@@ -1,5 +1,21 @@
 TODO
 
+----------------------
+NEW:
+----------------------
+
+1. a) Create Icons dir containing all App icons with the names bundleIdentifier.png
+   b) Packages with no icon must refer to a generic icon
+   c) Themes and some specific sections should have a specific generic icon
+
+2. Prefix all exec and execnoerror with /usr/libexec/cydia/exec
+
+3. Fix ignore apps without Uninstall scripts
+
+4. Clean up metadata.py - remove all the prints
+
+----------------------
+
 activate flag on copy path only in install - DONE
 
 preflight
