@@ -74,6 +74,8 @@ for x in *; do mv "`ls -d ${x} | grep -wv repo | grep -v .py | grep -v .xml`" re
 
 pushd repo/debs
 
+find . -name '.DS_Store' -exec rm -rf {} \; -prune
+
 for x in *; do 
 
 	dpkg -b $x 1>/dev/null 2>/dev/null
@@ -96,9 +98,9 @@ mkdir -p dists/stable/main/binary-darwin-arm
 
 cat<<END>dists/stable/Release
 
-Origin: $2
+Origin: stable
 
-Label: $2
+Label: ${repodesc}
 
 Suite: stable
 
@@ -134,10 +136,9 @@ END
 
 
 
-chmod +x mkpgs
+chmod +x mpkgs
 
-./mpkgs debs indices/override.stable.main | gzip -9 - -c > dists/stable/main/binary-darwin-arm/Packages.gz
-
+./mpkgs debs indices/override.stable.main | awk '{gsub("Section: Network","Section: Networking");print}'| gzip -9 - -c > dists/stable/main/binary-darwin-arm/Packages.gz
 
 
 mkdir -p conf
