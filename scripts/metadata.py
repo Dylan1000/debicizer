@@ -482,10 +482,13 @@ def generateShell(file,dir,n):
 			#if
                         print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
+                        insidecontent=0
                         if h[1].endswith('/'):
                             h[1] = h[1][0:-1]
+                            insidecontent=1
                         if h[2].endswith('/'):
                             h[2] = h[2][0:-1]
+                        
                         print h[2]
                         print h[2].find('~')
                         if (h[2].find('~')>-1):    
@@ -511,19 +514,29 @@ def generateShell(file,dir,n):
 			    #print type(h[2])
 			    #[0:file.rfind('.zip')].lower()
                             print os.path.basename(h[1]) + " el basename"
-                            if os.path.basename(h[2]) == os.path.basename(h[1]):
-                                #print "name is in destination path"
-                                #print h[2] + " " + h[1]
-                                print "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
-                                print "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
-                                print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
-                                print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
-                            else:
-                            #    print "mkdir -p \"`pwd`" + h[2] + "\""
-                            #    print "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
-                                print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
-                                print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "/\""
+#                            if os.path.basename(h[2]) == os.path.basename(h[1]):
+#                            	print "name is in destination path"
+#                            	print h[2] + " " + h[1]
+#                                print "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+#                                print "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
+#                                print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+#                                print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
+#                            else:
+#                            #    print "mkdir -p \"`pwd`" + h[2] + "\""
+#                            #    print "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')] + #"\""
+#                                print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
+#                                #print >>script, "cp -pR \"`pwd`/" + h[1] + "*\" \"`pwd`" + h[2] + "/\""
+#                                print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "/\""
+ 
                                 
+ 
+                            if insidecontent==0:
+				print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+				print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
+			    else:
+				print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+				print >>script, "cp -pR \"`pwd`/" + h[1] + "/\" \"`pwd`" + h[2] + "/\""
+				print >>script, "rm -rf \"`pwd`/" + h[1] + "/\""
                             print >>script, "cd .."
                             if operation == "inst":
                                 flagForCopyPath=1
@@ -532,6 +545,9 @@ def generateShell(file,dir,n):
                             script.close()
                             os.chmod(shellscript,0755) #needs to be octal not decimal
                             os.system("bash script.sh")
+                            #os.system("cp script.sh cosa.sh");
+                            #if h[2]=="/User/Media/MooCowMusic/Pianist":
+                            #	csfddsfsfs
                             script = open(shellscript, "w")
                             #fd.
                             #prefix="post"
@@ -581,6 +597,7 @@ def generateShell(file,dir,n):
                             #os.system("cat " + POSTINSTALL_PATH % file)
                             fd = open(archivo, "a")
                             flagForCopyPath=0
+
                 if h[0] == "RemovePath":
                     for j in h:
                         if j != "RemovePath":
@@ -655,6 +672,7 @@ def generateShell(file,dir,n):
                 else:
 			print h
                         print " es que no es nada de todo eso"
+
 
 
 
