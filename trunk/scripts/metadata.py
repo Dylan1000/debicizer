@@ -529,19 +529,21 @@ def generateShell(file,dir,n):
 #                                print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "/\""
  
                                 
- 
-                            if insidecontent==0:
-				print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
+                            if os.path.basename(h[2]) == os.path.basename(h[1]):
+                                print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
+                                print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')]  + "\""
+                            else:    
+                                if insidecontent==0:
+                                    print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
 				#print >>script, "mv -f \"`pwd`/" + h[1] + "/\" \"`pwd`" + h[2] + "/\""
-                                if os.path.basename(h[2]) == os.path.basename(h[1]):
-                                    print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')]  + "\""
-                                else:
+ 
+
                                     print >>script, "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "/\""
                                     print >>script, "rm -rf \"`pwd`/" + h[1] + "\""
-			    else:
-				print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
-				print >>script, "cp -pR \"`pwd`/" + h[1] + "/\" \"`pwd`" + h[2] + "/\""
-				print >>script, "rm -rf \"`pwd`/" + h[1] + "/\""
+                                else:
+                                    print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
+                                    print >>script, "cp -pR \"`pwd`/" + h[1] + "/\" \"`pwd`" + h[2] + "/\""
+                                    print >>script, "rm -rf \"`pwd`/" + h[1] + "/\""
                             print >>script, "cd .."
                             if operation == "inst":
                                 flagForCopyPath=1
