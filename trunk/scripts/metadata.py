@@ -551,9 +551,9 @@ def generateShell(file,dir,n):
                             os.chmod(shellscript,0755) #needs to be octal not decimal
                             os.system("bash script.sh")
                             os.system("cp script.sh cosa.sh");
-                            if h[2]=="/Applications/HP-11C.app":
-                            	csfddsfsfs
-                            script = open(shellscript, "w")
+                            #if h[2]=="/Applications/HP-11C.app":
+                            #	csfddsfsfs
+                            #script = open(shellscript, "w")
                             #fd.
                             #prefix="post"
                             #archivo=dir + "/DEBIAN/" + prefix + operation
