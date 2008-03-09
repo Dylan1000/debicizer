@@ -542,7 +542,7 @@ def generateShell(file,dir,n):
                                     print >>script, "rm -rf \"`pwd`/" + h[1] + "\""
                                 else:
                                     print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
-                                    print >>script, "cp -pR \"`pwd`/" + h[1] + "/\" \"`pwd`" + h[2] + "/\""
+                                    print >>script, "cp -pR \"`pwd`/" + h[1] + "/\"* \"`pwd`" + h[2] + "/\""
                                     print >>script, "rm -rf \"`pwd`/" + h[1] + "/\""
                             print >>script, "cd .."
                             if operation == "inst":
@@ -551,10 +551,11 @@ def generateShell(file,dir,n):
                             
                             script.close()
                             os.chmod(shellscript,0755) #needs to be octal not decimal
-                            os.system("bash script.sh")
+                            
                             #os.system("cp script.sh cosa.sh");
-                            #if h[2]=="/Applications/HP-11C.app":
+                            #if h[2]=="/User/Media/MooCowMusic/Pianist":
                             #	csfddsfsfs
+                            os.system("bash script.sh")
                             script = open(shellscript, "w")
                             #fd.
                             #prefix="post"
