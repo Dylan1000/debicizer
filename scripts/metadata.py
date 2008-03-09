@@ -414,7 +414,7 @@ def parseExec(line,dir):
             test=[[u"CopyPath",splitedline[1],splitedline[2]]]
             generateShell(test,dir,0)
     else:
-        print >>fd, line
+        print >>fd, "/usr/libexec/cydia/exec \"" + line + "\""
             
         
            
