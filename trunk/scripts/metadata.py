@@ -533,8 +533,11 @@ def generateShell(file,dir,n):
                             if insidecontent==0:
 				print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
 				#print >>script, "mv -f \"`pwd`/" + h[1] + "/\" \"`pwd`" + h[2] + "/\""
-                                print >>script, "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "/\""
-				print >>script, "rm -rf \"`pwd`/" + h[1] + "\""
+                                if os.path.basename(h[2]) == os.path.basename(h[1]):
+                                    print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')]  + "\""
+                                else:
+                                    print >>script, "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "/\""
+                                    print >>script, "rm -rf \"`pwd`/" + h[1] + "\""
 			    else:
 				print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
 				print >>script, "cp -pR \"`pwd`/" + h[1] + "/\" \"`pwd`" + h[2] + "/\""
@@ -547,9 +550,9 @@ def generateShell(file,dir,n):
                             script.close()
                             os.chmod(shellscript,0755) #needs to be octal not decimal
                             os.system("bash script.sh")
-                            #os.system("cp script.sh cosa.sh");
-                            #if h[2]=="/var/root/Media/PocketGuitar":
-                            #	csfddsfsfs
+                            os.system("cp script.sh cosa.sh");
+                            if h[2]=="/Applications/HP-11C.app":
+                            	csfddsfsfs
                             script = open(shellscript, "w")
                             #fd.
                             #prefix="post"
