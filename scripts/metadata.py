@@ -547,9 +547,9 @@ def generateShell(file,dir,n):
                             script.close()
                             os.chmod(shellscript,0755) #needs to be octal not decimal
                             os.system("bash script.sh")
-                            os.system("cp script.sh cosa.sh");
-                            if h[2]=="/var/root/Media/PocketGuitar":
-                            	csfddsfsfs
+                            #os.system("cp script.sh cosa.sh");
+                            #if h[2]=="/var/root/Media/PocketGuitar":
+                            #	csfddsfsfs
                             script = open(shellscript, "w")
                             #fd.
                             #prefix="post"
