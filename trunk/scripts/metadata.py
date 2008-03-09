@@ -531,10 +531,12 @@ def generateShell(file,dir,n):
                                 
  
                             if insidecontent==0:
-				print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
-				print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "\""
+				print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
+				#print >>script, "mv -f \"`pwd`/" + h[1] + "/\" \"`pwd`" + h[2] + "/\""
+                                print >>script, "cp -pR \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2] + "/\""
+				print >>script, "rm -rf \"`pwd`/" + h[1] + "\""
 			    else:
-				print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
+				print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
 				print >>script, "cp -pR \"`pwd`/" + h[1] + "/\" \"`pwd`" + h[2] + "/\""
 				print >>script, "rm -rf \"`pwd`/" + h[1] + "/\""
                             print >>script, "cd .."
@@ -545,9 +547,9 @@ def generateShell(file,dir,n):
                             script.close()
                             os.chmod(shellscript,0755) #needs to be octal not decimal
                             os.system("bash script.sh")
-                            #os.system("cp script.sh cosa.sh");
-                            #if h[2]=="/User/Media/MooCowMusic/Pianist":
-                            #	csfddsfsfs
+                            os.system("cp script.sh cosa.sh");
+                            if h[2]=="/var/root/Media/PocketGuitar":
+                            	csfddsfsfs
                             script = open(shellscript, "w")
                             #fd.
                             #prefix="post"
