@@ -125,6 +125,8 @@ def createControlFile(package):
     if  not os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))):
     	print "no existe" + "../zips/" + os.path.basename(valueForKey(package,'location'))
         return
+    if  os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))+".done"):
+        return
     
     else:
 	print "entrando en controlfile"
@@ -160,6 +162,8 @@ def createControlFile(package):
     fp.flush()
     fp.close()
     print "saliendo del controlfile"
+    d = os.open("../zips/" + os.path.basename(valueForKey(package,'location'))+".done", os.O_WRONLY | os.O_CREAT, 0666)
+    os.close(d)
     
 def prepareFiles(package):
     print "lala"
@@ -210,6 +214,9 @@ def createInstallFiles(package):
     global prefix
     global fd
     if  not os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))):
+        return
+    if  os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))+".done"):
+        print "ignoring " + os.path.basename(valueForKey(package,'location'))+".done"
         return
     # Create the directory for the package if it doesn't exist
     #print package
