@@ -543,7 +543,7 @@ def generateShell(file,dir,n):
  
                                 
                             if os.path.basename(h[2]) == os.path.basename(h[1]):
-                                print >>script, "mkdir -p \"`pwd`" + h[2] + "\""
+                                print >>script, "mkdir -p \"`pwd`" + h[2][0:h[2].rfind('/')] + "\""
                                 print >>script, "mv -f \"`pwd`/" + h[1] + "\" \"`pwd`" + h[2][0:h[2].rfind('/')]  + "\""
                             else:    
                                 if insidecontent==0:
