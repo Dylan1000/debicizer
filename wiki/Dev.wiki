@@ -1,6 +1,7 @@
 #Start deving
 
 mkdir example
+
 cd example
 
 svn co http://debicizer.googlecode.com/svn/trunk/
