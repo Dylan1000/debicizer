@@ -421,6 +421,8 @@ def parseExec(line,dir):
             test=[[u"CopyPath",splitedline[1],splitedline[2]]]
             generateShell(test,dir,0)
     else:
+        if line.find(' '):
+            sys.stderr.write(line + '<----if some argument has spaces the exec statement will generated wrong\n')
         line=line.replace( ' ', '" "' )
         print >>fd, "/usr/libexec/cydia/exec \"" + line + "\""
             
