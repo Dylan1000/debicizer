@@ -421,6 +421,7 @@ def parseExec(line,dir):
             test=[[u"CopyPath",splitedline[1],splitedline[2]]]
             generateShell(test,dir,0)
     else:
+        line=line.replace( ' ', '" "' )
         print >>fd, "/usr/libexec/cydia/exec \"" + line + "\""
             
         
@@ -640,8 +641,11 @@ def generateShell(file,dir,n):
                     #print "vamos a ver el exec"
                     #print type(h[1])
                     #print h
-                    #print "".join(h[1]) + " es un exec "
+                    #print "\\-".join(h[1:]) + " es un exec "
                     parseExec(h[1],dir)
+                    #works
+                    #test
+                    #parseExec("\\".join(h[1:]),dir)
                     #if h[1].startswith('/bin/mkdir'):
                     #    print "es un mkdir"
                     #print " ".join(h[1:]) + "||" + "".join(h[1][0]) + "||" + "".join(h[1][1])+ "||" + "".join(h[1][2])
@@ -655,8 +659,9 @@ def generateShell(file,dir,n):
                     print >>fd, "true"
                 elif h[0] == "SetStatus":
                         print >>fd, "echo " + " ".join(h[1:])
-                elif h[0] == "Notice":
-                        print >>fd, "echo \'" + " ".join(h[1:]) + "\'"
+                #elif h[0] == "Notice":
+                        #replace the ' with \' before printing in file or it will break
+                        #print >>fd, "echo \'" + " ".join(h[1:]) + "\'"
                 elif h[0] == "MovePath":
                         print >>fd, "mv -f \"" + h[1] + "\" \"" + h[2] + "\""
                 elif h[0] == "If":
