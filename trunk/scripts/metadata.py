@@ -355,9 +355,12 @@ def parser(IF):
                 for k in IF[1][0][1]:
                     print "sera el paquete instalado?"
                     print IF[1][0]
-                    depends.append(k)
+                    #h[2].find('/var/mobile')>-1
+                    if IF[1][0].find('com.natetrue.iphone.iphone_binkit')==-1:
+                        depends.append(k)
             else:
-                depends.append(IF[1][0][1])
+                if IF[1][0][1].find('com.natetrue.iphone.iphone_binkit')==-1:
+                    depends.append(IF[1][0][1])
             
             
             #cosa
