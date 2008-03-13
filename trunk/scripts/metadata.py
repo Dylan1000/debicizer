@@ -218,10 +218,6 @@ def createInstallFiles(package):
     if  os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))+".done"):
         print "ignoring " + os.path.basename(valueForKey(package,'location'))+".done"
         return
-    # Create the directory for the package if it doesn't exist
-    #print package
-    #print "* Creating install and remove files for %s" % (package_name(package))
-    #print package_name(package)
     try:
         os.makedirs(PACKAGE_DIR % package_name(package))
     except OSError,a:
@@ -267,9 +263,6 @@ def createInstallFiles(package):
         #fp3 = open(install, "a")
         #print >>fp3, "exit"
         #fp3.close()
-    #remove = PREREMOVE_PATH % package_name(package)
-    #fp4 = open(remove, "w")
-    #print >>fp4, "#!/bin/bash"
     script.close()
     os.chmod(shellscript,0755) #needs to be octal not decimal
     os.system("bash script.sh")
