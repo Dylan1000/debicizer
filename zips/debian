@@ -52,7 +52,6 @@ find . -name '.DS_Store' -exec rm -rf {} \; -prune
 ### 4. Building packages and cleaning up ##############
 for x in *; do dpkg -b $x 1>/dev/null 2>/dev/null; done
 ls -d * | grep -v .deb | xargs rm -rf
-done
 popd
 ### END ###############################################
 
