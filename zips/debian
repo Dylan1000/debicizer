@@ -1,196 +1,123 @@
 #!/bin/bash
 
-
-
 print_usage() {
-
 echo "Syntax:      $0 firstrun/newpackage/editpackage"
-
 echo 
-
 echo "Usage Examples:-"
-
 echo 
-
 echo "firstrun:    $0 firstrun InstallerSourceXML \"Repository Full Name\""
-
 echo "newpackage:  $0 newpackage packagename.zip Category Version \"Description\""
-
 echo "editpackage: $0 editpackage packagename MaintainerName MaintainerEmail Category Version \"Description\""
-
 }
 
-
-
+### Vars ######
 repofile=${2}
-
 repodesc="${3}"
-
-
+### END #######
 
 first_run() {
 
+### 1. Unzipping packages and creating metadata #########################################
 mkdir -p ../unzipped
-
 cp -R ../scripts/* ../unzipped/
-
 for z in *.zip; do unzip -K -o -qq $z -d ../unzipped/`basename $z .zip|tr A-Z a-z`/; done
-
 cd ../unzipped/
-
 python metadata.py $repofile
+### END #################################################################################
 
+### 2. Preparing packages ############
 for x in *; do
-
 	if [ -d ${x}/__MACOSX ]; then
-
 		rm -rf ${x}/__MACOSX
-
 	fi
-
 	if [ -d ${x}/DEBIAN ]; then
-
 		echo "" >> ${x}/DEBIAN/control
-
 		chmod +x ${x}/DEBIAN/*
-
 	fi
-
 	if [ -e ${x}/test.txt ]; then
-
 		rm -f ${x}/test.txt
-
 	fi
-
 done
+### END ##############################
 
 
-
+### 3. Moving package folders to their repository destination ################################
 mkdir -p repo/debs
-
 mv mpkgs repo/mpkgs
-
 for x in *; do mv "`ls -d ${x} | grep -wv repo | grep -v .py | grep -v .xml`" repo/debs/; done
-
 pushd repo/debs
-
 find . -name '.DS_Store' -exec rm -rf {} \; -prune
+### END ######################################################################################
 
-for x in *; do 
-
-	dpkg -b $x 1>/dev/null 2>/dev/null
-
-#	rm -rf $x
-
+### 4. Building packages and cleaning up ##############
+for x in *; do dpkg -b $x 1>/dev/null 2>/dev/null; done
+ls -d * | grep -v .deb | xargs rm -rf
 done
-
 popd
+### END ###############################################
 
+### 5. Creating Repository Info Files #################################################################################################################################
 mkdir -p repo/indices
-
 touch repo/indices/override.stable.main
-
 cd repo
 
 mkdir -p dists/stable/main/binary-darwin-arm
 
-
-
 cat<<END>dists/stable/Release
-
 Origin: stable
-
 Label: ${repodesc}
-
 Suite: stable
-
 Version: 1.0
-
 Codename: stable
-
 Architectures: darwin-arm
-
 Components: main
-
 Description: ${repodesc}
-
 END
-
-
 
 cat<<END>dists/stable/main/binary-darwin-arm/Release
-
 Archive: stable
-
 Version: 1.0
-
 Component: main
-
 Origin: stable
-
 Label: ${repodesc}
-
 Architecture: darwin-arm
-
 END
 
-
-
 chmod +x mpkgs
-
 ./mpkgs debs indices/override.stable.main | awk '{gsub("Section: Network","Section: Networking");print}'| gzip -9 - -c > dists/stable/main/binary-darwin-arm/Packages.gz
-
 
 mkdir -p conf
 
 cat<<END>conf/distributions
-
 Origin: stable
-
-Label: stable
-
+Label: ${repodesc}
 Suite: stable
-
 Codename: stable
-
 Architectures: darwin-arm
-
 Components: main
-
 Description: ${repodesc}
-
 END
+### END #################################################################################################################################################################
 
-
-
+### 6. Cleanups ########
 if [ -d private/ ]; then
-
 	rm -rf private
-
 fi
-
+### END ################
 }
 
-
-
+### Debicizer option selection ##
 case $1 in
-
 	--usage ) print_usage ;;
-
 	firstrun ) first_run ;;
-
 	newpackage ) new_package ;;
-
 	editpackage ) edit_package ;;
-
 	"" ) print_usage ;;
-
 esac
+### END #########################
 
-
-
-corrupted_control(){
-
-for c in *; do rm -f ${c}/DEBIAN/control; done
-
+### Not implemented ####################
+corrupted_metadata(){
+for c in *; do rm -f ${c}/DEBIAN/*; done
 }
+### END ################################
