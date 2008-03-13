@@ -218,6 +218,10 @@ def createInstallFiles(package):
     if  os.path.exists("../zips/" + os.path.basename(valueForKey(package,'location'))+".done"):
         print "ignoring " + os.path.basename(valueForKey(package,'location'))+".done"
         return
+    # Create the directory for the package if it doesn't exist
+    #print package
+    #print "* Creating install and remove files for %s" % (package_name(package))
+    #print package_name(package)
     try:
         os.makedirs(PACKAGE_DIR % package_name(package))
     except OSError,a:
@@ -238,6 +242,7 @@ def createInstallFiles(package):
     print package.keys()
     print type(package)
     print package
+    global directory
     directory=package_name(package)
     if test.has_key('preflight'):
         operation="inst"
@@ -263,6 +268,9 @@ def createInstallFiles(package):
         #fp3 = open(install, "a")
         #print >>fp3, "exit"
         #fp3.close()
+    #remove = PREREMOVE_PATH % package_name(package)
+    #fp4 = open(remove, "w")
+    #print >>fp4, "#!/bin/bash"
     script.close()
     os.chmod(shellscript,0755) #needs to be octal not decimal
     os.system("bash script.sh")
@@ -308,7 +316,11 @@ def stringer(algo):
 def parser(IF):
     global fd
     global depends
+    global directory
     print IF
+    print "es el parser"
+    print IF
+    
     temp=[]
     if IF[0]=="IfNot":
         if IF[1][0][0]=="FirmwareVersionIs":
@@ -354,12 +366,32 @@ def parser(IF):
             else:
                 if IF[1][0][1].find('com.natetrue.iphone.iphone_binkit')==-1:
                     depends.append(IF[1][0][1])
+        elif IF[1][0][0]=="Exec":
+            print IF[1][0]
+            print IF[1][0][1]
+            print IF[1][0][0]
+            print IF[2]
+            parseExec(IF[1][0][1],directory)
+            print >>fd, "if [ \"${?}\" -ne \"0\" ] ; then"
+            generateShell(IF[2],directory,0)
+            print >>fd, "true"
+            print >>fd, "fi"
+            
+            
+            
             
             
             #cosa
-
+          
             
         else:
+            #sys.stderr.write("".join(IF))
+            print "veamos"
+            print IF[0]
+            print IF[1]
+            print IF[1][0]
+            print IF[1][0][1]
+            print IF[1][0][0]
             print "mequivocau"
     
     
@@ -379,6 +411,7 @@ def parseExec(line,dir):
     print "estamos en parseexec"
     print dir + " es el dir"
     print line + " es la linea"
+    print line
     print type(line)
     splitedline=line.split()
     print splitedline
@@ -416,6 +449,8 @@ def parseExec(line,dir):
         else:
             test=[[u"CopyPath",splitedline[1],splitedline[2]]]
             generateShell(test,dir,0)
+    elif splitedline[0].endswith('/launchctl'):
+        print >>fd, line
     else:
         #if line.find(' '):
         #   sys.stderr.write(line + '<----if some argument has spaces the exec statement will generated wrong\n')
@@ -656,10 +691,14 @@ def generateShell(file,dir,n):
                     parseExec(h[1],dir)
                     print >>fd, "true"
                 elif h[0] == "SetStatus":
-                        print >>fd, "echo " + " ".join(h[1:])
-                #elif h[0] == "Notice":
+                        h[1]=h[1].replace( '\'', '\\\'' )
+                        print "set status"
+                        print h[1]
+                        print >>fd, "echo \'" + " ".join(h[1:]) + "\'"
+                elif h[0] == "Notice":
+                        h[1]=h[1].replace( '\'', '\\\'' )
                         #replace the ' with \' before printing in file or it will break
-                        #print >>fd, "echo \'" + " ".join(h[1:]) + "\'"
+                        print >>fd, "echo \'" + " ".join(h[1:]) + "\'"
                 elif h[0] == "MovePath":
                         print >>fd, "mv -f \"" + h[1] + "\" \"" + h[2] + "\""
                 elif h[0] == "If":
@@ -680,6 +719,10 @@ def generateShell(file,dir,n):
                                 	print >>fd, "fi"
 					#print "es un ExistsPath"
 					#print h[2]
+                elif h[0] == "IfNot":
+                    #print ifnot
+                    print h
+                    parser(h)
 		elif h[0] == "InstallApp":
                     test=[[u"CopyPath",h[1],"/Applications"]]
                     generateShell(test,dir,0)
