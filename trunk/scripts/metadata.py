@@ -65,6 +65,7 @@ def get_contact(package):
 
 def package_id(package):
     bundle = package.get('bundleIdentifier')
+    bundle=bundle.replace('_', '-' )
     return bundle.lower()
 
 def find_icons(package):
@@ -159,6 +160,7 @@ def createControlFile(package):
                 content.append('%s: %s' % (ctrl_key, val))
         #[content.append('%s: %s' % (ctrl_key, val)) for val in value]
     fp.write("\n".join(content))
+    #fp.write("\n")
     fp.flush()
     fp.close()
     print "saliendo del controlfile"
@@ -234,6 +236,7 @@ def createInstallFiles(package):
     prefix="pre"
     test = valueForKey(package,'scripts')
     prepareFiles(package)
+    print "".join(test) + " es estooooooooooo"
     global script
     global shellscript
     global directory
@@ -281,6 +284,21 @@ def createInstallFiles(package):
 	operation="rm"
 	k = valueForKey(test,'uninstall')
 	generateShell(k,package_name(package),1)
+    #print test.has_key('postflight')
+    
+    if test.has_key('postflight'):
+        prefix="post"
+        fd.close()
+        z=valueForKey(test,'postflight')
+        print directory
+        #print prefix
+        #print operation
+        #print directory + "/DEBIAN/" + prefix + operation
+        archivo=directory + "/DEBIAN/" + prefix + operation
+        fd = open(archivo, "a")
+        #fdfsdf
+        parserPostflight(z)
+            
     #print >>fp4, "exit"
     #fp4.close()
     #closeFiles(package)
@@ -292,7 +310,36 @@ def createInstallFiles(package):
 #                       k = valueForKey(test,'uninstall')
                         #generateShell(k)
 
-
+def parserPostflight(algo):
+    
+    print "es el post flight"
+    print algo
+    print algo[0]
+    print algo[0][0]
+    for p in algo:
+        print "lala"
+        print p
+        print p[0]
+        print p[1][0][0]
+        #print p[2]
+        print "buuuuuuuuuuu"
+        if p[0]=="IfNot":
+            print p[1]
+            if p[1][0][0]=="InstalledPackage":
+                print >>fd, "if [ $(dpkg -l|grep ^ii|awk '{print $2}'| grep -c ^" + p[1][0][1] + "$) -ne 1]; then"
+                #test=[[u"CopyPath",splitedline[1],splitedline[2]]]
+                generateShell(p[2],directory,0)
+                print >>fd, "fi"
+                #parse
+        elif p[0]=="Notice":
+            print p
+            generateShell([p],directory,0)
+            print "fiuuuuuuuuuuuuuuuu"
+                
+            
+    #print >>fd, algo
+    #print >>fd, algo[0]
+    #sdfsdfsd
 
 def parsepreflight(algo):
     print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -327,7 +374,7 @@ def parser(IF):
             for k in IF[1][0][1]:
                 #print k
                 print "sera la version?"
-                temp.append("firmware ("+ k + ")")
+                temp.append("firmware (="+ k + ")")
                 #types.StringTypes.
                 
                 #temp.append("firmware("+ k + ")")
@@ -362,6 +409,7 @@ def parser(IF):
                     print IF[1][0]
                     #h[2].find('/var/mobile')>-1
                     if IF[1][0].find('com.natetrue.iphone.iphone_binkit')==-1:
+                        
                         depends.append(k)
             else:
                 if IF[1][0][1].find('com.natetrue.iphone.iphone_binkit')==-1:
@@ -454,7 +502,7 @@ def parseExec(line,dir):
     else:
         #if line.find(' '):
         #   sys.stderr.write(line + '<----if some argument has spaces the exec statement will generated wrong\n')
-        #line=line.replace( ' ', '" "' )
+        #line=line.package_idreplace( ' ', '" "' )
         #print >>fd, "/usr/libexec/cydia/exec \"" + line + "\""
         print >>fd, "/usr/libexec/cydia/exec " + line    
         
@@ -551,6 +599,9 @@ def generateShell(file,dir,n):
 			if isRelative(h[1]) and os.path.exists(dir + "/" + h[1]):# and operation == "inst":
                             print "is relative"
                             #print "me cago en tus muertos"
+                            os.system("bash script.sh")
+                            script = open(shellscript, "w")
+                            
 			    print >>script, "cd " + dir
 			    #print type(h[2])
 			    #[0:file.rfind('.zip')].lower()
