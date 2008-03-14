@@ -32,7 +32,7 @@ python metadata.py $repofile > ../../debug/debug.txt
 
 ### 2. Preparing packages ########################
 echo 2/4: Preparing packages....
-rm -f *.py *.pyc *.xml
+rm -f *.py *.pyc *.xml *.sh
 for x in *; do
 	if [ -d ${x}/__MACOSX ]; then
 		rm -rf ${x}/__MACOSX
