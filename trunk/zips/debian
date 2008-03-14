@@ -41,9 +41,7 @@ for x in *; do
 		echo "" >> ${x}/DEBIAN/control
 		chmod +x ${x}/DEBIAN/*
 	fi
-#	if [ -e ${x}/test.txt ]; then
-		rm -f ${x}/*.txt
-#	fi
+rm -f ${x}/*.txt
 done
 find . -name '.DS_Store' -exec rm -rf {} \; -prune
 rm -f *.py *.pyc *.xml
@@ -56,7 +54,7 @@ ls -d * | grep -v .deb | xargs rm -rf
 cd ..
 ### END ###############################################
 
-### 4. Creating Repository Info Files #################################################################################################################################
+### 4. Creating Repository Info Files ###############################################################################################################################################################
 echo 4/4: Creating Repository Info Files
 rm -f dists/stable/main/binary-darwin-arm/Packages*
 chmod +x mpkgs
@@ -64,8 +62,18 @@ chmod +x mpkgs
 cp dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages 
 gzip -9 -f dists/stable/main/binary-darwin-arm/Packages
 mv dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages
+
+cat<<END>dists/stable/Release2
+`cat < dists/stable/Release | grep -v Packages.gz`
+END
+
+rm -f dists/stable/Release
+mv dists/stable/Release2 dists/stable/Release
+
+for file in dists/stable/main/binary-darwin-arm/Packages.gz; do echo " $(md5sum "${file}" | cut -d ' ' -f 1) $(du -b "${file}" | cut -d $'\t' -f 1) ${file}"; done >>dists/stable/Release
+
 echo Exit Status: $?
-### END #################################################################################################################################################################
+### END #############################################################################################################################################################################################
 }
 
 first_run() {
@@ -93,9 +101,7 @@ for x in *; do
 		echo "" >> ${x}/DEBIAN/control
 		chmod +x ${x}/DEBIAN/*
 	fi
-#	if [ -e ${x}/test.txt ]; then
-		rm -f ${x}/*.txt
-#	fi
+rm -f ${x}/*.txt
 done
 find . -name '.DS_Store' -exec rm -rf {} \; -prune
 rm -f *.py *.pyc *.xml
@@ -109,12 +115,18 @@ ls -d * | grep -v .deb | xargs rm -rf
 cd ..
 ### END ###############################################
 
-### 4. Creating Repository Info Files #################################################################################################################################
+### 4. Creating Repository Info Files ################################################################################################################################################################
 echo 4/4: Creating Repository Info Files
 mkdir -p indices
 touch indices/override
 
 mkdir -p dists/stable/main/binary-darwin-arm
+
+chmod +x mpkgs
+./mpkgs debs indices/override | awk '{gsub("Section: Network\n","Section: Networking\n");print}' > dists/stable/main/binary-darwin-arm/Packages2
+cp dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages 
+gzip -9 -f dists/stable/main/binary-darwin-arm/Packages
+mv dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages
 
 cat<<END>dists/stable/Release
 Origin: stable
@@ -125,13 +137,10 @@ Codename: stable
 Architectures: darwin-arm
 Components: main
 Description: ${repodesc}
-END
+MD5Sum:
 
-chmod +x mpkgs
-./mpkgs debs indices/override | awk '{gsub("Section: Network\n","Section: Networking\n");print}' > dists/stable/main/binary-darwin-arm/Packages2
-cp dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages 
-gzip -9 -f dists/stable/main/binary-darwin-arm/Packages
-mv dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages
+END
+for file in dists/stable/main/binary-darwin-arm/{Packages.gz, Packages}; do echo " $(md5sum "${file}" | cut -d ' ' -f 1) $(du -b "${file}" | cut -d $'\t' -f 1) ${file}"; done >>dists/stable/Release
 
 mkdir -p conf
 
@@ -145,7 +154,7 @@ Components: main
 Description: ${repodesc}
 END
 echo Exit Status: $?
-### END #################################################################################################################################################################
+### END ##############################################################################################################################################################################################
 }
 
 ### Debicizer option selection ##
