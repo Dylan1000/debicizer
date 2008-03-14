@@ -22,7 +22,8 @@ mkdir -p ../unzipped
 cp -R ../scripts/* ../unzipped/
 for z in *.zip; do unzip -K -o -qq $z -d ../unzipped/`basename $z .zip|tr A-Z a-z`/; done
 cd ../unzipped/
-python metadata.py $repofile
+mkdir -p ../debug
+python metadata.py $repofile > ../debug/debug.txt
 ### END #################################################################################
 
 ### 2. Preparing packages ############
@@ -34,20 +35,19 @@ for x in *; do
 		echo "" >> ${x}/DEBIAN/control
 		chmod +x ${x}/DEBIAN/*
 	fi
-	if [ -e ${x}/test.txt ]; then
-		rm -f ${x}/test.txt
-	fi
+#	if [ -e ${x}/test.txt ]; then
+		rm -f ${x}/*.txt
+#	fi
 done
 ### END ##############################
 
 
 ### 3. Moving package folders to their repository destination ################################
-mkdir -p repo/debs
-mv mpkgs repo/mpkgs
+mkdir -p debs
 rm -f *.py *.pyc *.xml
-mv * repo/debs/
+mv * debs/
 #for x in *; do mv "`ls -d ${x} | grep -wv repo`" repo/debs/; done
-pushd repo/debs
+pushd debs
 find . -name '.DS_Store' -exec rm -rf {} \; -prune
 ### END ######################################################################################
 
@@ -58,9 +58,8 @@ popd
 ### END ###############################################
 
 ### 5. Creating Repository Info Files #################################################################################################################################
-mkdir -p repo/indices
-touch repo/indices/override.stable.main
-cd repo
+mkdir -p indices
+touch indices/override.stable.main
 
 mkdir -p dists/stable/main/binary-darwin-arm
 
@@ -75,14 +74,14 @@ Components: main
 Description: ${repodesc}
 END
 
-cat<<END>dists/stable/main/binary-darwin-arm/Release
-Archive: stable
-Version: 1.0
-Component: main
-Origin: stable
-Label: ${repodesc}
-Architecture: darwin-arm
-END
+#cat<<END>dists/stable/main/binary-darwin-arm/Release
+#Archive: stable
+#Version: 1.0
+#Component: main
+#Origin: stable
+#Label: ${repodesc}
+#Architecture: darwin-arm
+#END
 
 chmod +x mpkgs
 ./mpkgs debs indices/override.stable.main | awk '{gsub("Section: Network","Section: Networking");print}'| gzip -9 - -c > dists/stable/main/binary-darwin-arm/Packages.gz
@@ -101,9 +100,9 @@ END
 ### END #################################################################################################################################################################
 
 ### 6. Cleanups ########
-if [ -d private/ ]; then
-	rm -rf private
-fi
+#if [ -d private/ ]; then
+#	rm -rf private
+#fi
 ### END ################
 }
 
