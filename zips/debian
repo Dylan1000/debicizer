@@ -33,10 +33,8 @@ python metadata.py $repofile > ../../debug/debug.txt
 ### 2. Preparing packages ########################
 echo 2/4: Preparing packages....
 if [ -f setperms.sh ]; then
-	echo Entering fakeroot and settings perms....
-	fakeroot
+	echo Setting package-specific perms...
 	./setperms.sh
-	exit
 fi
 rm -f *.py *.pyc *.xml *.sh
 for x in *; do
@@ -69,6 +67,7 @@ mv dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin
 }
 
 update_repo() {
+fakeroot
 steps1_3_run
 rm -f dists/stable/main/binary-darwin-arm/Packages*
 step4b_run
@@ -77,9 +76,11 @@ cat<<END>dists/stable/Release
 END
 for file in dists/stable/main/binary-darwin-arm/Packages.gz; do echo " $(md5sum "${file}" | cut -d ' ' -f 1) $(du -b "${file}" | cut -d $'\t' -f 1) ${file}";done >> dists/stable/Release
 echo Exit Status: $?
+exit
 }
 
 first_run() {
+fakeroot
 rm -f *.done
 rm -rf ../unzipped
 
@@ -115,6 +116,7 @@ Components: main
 Description: ${repodesc}
 END
 echo Exit Status: $?
+exit
 }
 
 ### Debicizer option selection ##
