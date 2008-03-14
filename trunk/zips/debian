@@ -6,6 +6,7 @@ echo
 echo "Usage Examples:-"
 echo 
 echo "firstrun:    $0 firstrun InstallerSourceXML \"Repository Full Name\""
+echo "update:      $0 update"
 echo "newpackage:  $0 newpackage packagename.zip Category Version \"Description\""
 echo "editpackage: $0 editpackage packagename MaintainerName MaintainerEmail Category Version \"Description\""
 }
@@ -15,18 +16,19 @@ repofile=${2}
 repodesc="${3}"
 ### END #######
 
-first_run() {
+update_repo() {
+### 1. Unzipping packages and creating metadata ##############################################
+mkdir -p ../unzipped/debs
+cp ../scripts/*.py ../unzipped/debs/
+cp ../scripts/*.xml ../unzipped/debs/
+cp ../scripts/mpkgs ../unzipped/
+for z in *.zip; do unzip -K -o -qq $z -d ../unzipped/debs/`basename $z .zip|tr A-Z a-z`/; done
+cd ../unzipped/debs
+mkdir -p ../../debug
+python metadata.py $repofile > ../../debug/debug.txt
+### END ######################################################################################
 
-### 1. Unzipping packages and creating metadata #########################################
-mkdir -p ../unzipped
-cp -R ../scripts/* ../unzipped/
-for z in *.zip; do unzip -K -o -qq $z -d ../unzipped/`basename $z .zip|tr A-Z a-z`/; done
-cd ../unzipped/
-mkdir -p ../debug
-python metadata.py $repofile > ../debug/debug.txt
-### END #################################################################################
-
-### 2. Preparing packages ############
+### 2. Preparing packages ########################
 for x in *; do
 	if [ -d ${x}/__MACOSX ]; then
 		rm -rf ${x}/__MACOSX
@@ -39,27 +41,70 @@ for x in *; do
 		rm -f ${x}/*.txt
 #	fi
 done
-### END ##############################
-
-
-### 3. Moving package folders to their repository destination ################################
-mkdir -p debs
-rm -f *.py *.pyc *.xml
-mv * debs/
-#for x in *; do mv "`ls -d ${x} | grep -wv repo`" repo/debs/; done
-pushd debs
 find . -name '.DS_Store' -exec rm -rf {} \; -prune
-### END ######################################################################################
+rm -f *.py *.pyc *.xml
+### END ##########################################
 
-### 4. Building packages and cleaning up ##############
+### 3. Building packages and cleaning up ##############
 for x in *; do dpkg -b $x 1>/dev/null 2>/dev/null; done
 ls -d * | grep -v .deb | xargs rm -rf
-popd
+cd ..
 ### END ###############################################
 
-### 5. Creating Repository Info Files #################################################################################################################################
+### 4. Creating Repository Info Files #################################################################################################################################
 mkdir -p indices
-touch indices/override.stable.main
+touch indices/override
+rm -f dists/stable/main/binary-darwin-arm/Packages*
+chmod +x mpkgs
+./mpkgs debs indices/override | awk '{gsub("Section: Network\n","Section: Networking\n");print}' > dists/stable/main/binary-darwin-arm/Packages2
+cp dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages 
+gzip -9 -f dists/stable/main/binary-darwin-arm/Packages
+mv dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages
+### END #################################################################################################################################################################
+
+}
+
+first_run() {
+### 1. Unzipping packages and creating metadata ##############################################
+mkdir -p ../unzipped/debs
+cp ../scripts/*.py ../unzipped/debs/
+cp ../scripts/*.xml ../unzipped/debs/
+cp ../scripts/mpkgs ../unzipped/
+rm -f *.done
+rm -rf ../unzipped
+for z in *.zip; do unzip -K -o -qq $z -d ../unzipped/debs/`basename $z .zip|tr A-Z a-z`/; done
+cd ../unzipped/debs
+mkdir -p ../../debug
+python metadata.py $repofile > ../../debug/debug.txt
+### END ######################################################################################
+
+### 2. Preparing packages ########################
+for x in *; do
+	if [ -d ${x}/__MACOSX ]; then
+		rm -rf ${x}/__MACOSX
+	fi
+	if [ -d ${x}/DEBIAN ]; then
+		echo "" >> ${x}/DEBIAN/control
+		chmod +x ${x}/DEBIAN/*
+	fi
+#	if [ -e ${x}/test.txt ]; then
+		rm -f ${x}/*.txt
+#	fi
+done
+find . -name '.DS_Store' -exec rm -rf {} \; -prune
+rm -f *.py *.pyc *.xml
+### END ##########################################
+
+
+### 3. Building packages and cleaning up ##############
+for x in *; do dpkg -b $x 1>/dev/null 2>/dev/null; done
+ls -d * | grep -v .deb | xargs rm -rf
+cd ..
+### END ###############################################
+
+### 4. Creating Repository Info Files #################################################################################################################################
+mkdir -p indices
+touch indices/override
 
 mkdir -p dists/stable/main/binary-darwin-arm
 
@@ -74,17 +119,11 @@ Components: main
 Description: ${repodesc}
 END
 
-#cat<<END>dists/stable/main/binary-darwin-arm/Release
-#Archive: stable
-#Version: 1.0
-#Component: main
-#Origin: stable
-#Label: ${repodesc}
-#Architecture: darwin-arm
-#END
-
 chmod +x mpkgs
-./mpkgs debs indices/override.stable.main | awk '{gsub("Section: Network","Section: Networking");print}'| gzip -9 - -c > dists/stable/main/binary-darwin-arm/Packages.gz
+./mpkgs debs indices/override | awk '{gsub("Section: Network\n","Section: Networking\n");print}' > dists/stable/main/binary-darwin-arm/Packages2
+cp dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages 
+gzip -9 -f dists/stable/main/binary-darwin-arm/Packages
+mv dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages
 
 mkdir -p conf
 
@@ -98,18 +137,13 @@ Components: main
 Description: ${repodesc}
 END
 ### END #################################################################################################################################################################
-
-### 6. Cleanups ########
-#if [ -d private/ ]; then
-#	rm -rf private
-#fi
-### END ################
 }
 
 ### Debicizer option selection ##
 case $1 in
 	--usage ) print_usage ;;
 	firstrun ) first_run ;;
+	update ) update_repo ;;
 	newpackage ) new_package ;;
 	editpackage ) edit_package ;;
 	"" ) print_usage ;;
