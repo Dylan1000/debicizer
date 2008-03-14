@@ -18,10 +18,13 @@ repodesc="${3}"
 
 update_repo() {
 ### 1. Unzipping packages and creating metadata ##############################################
+echo 1/4: Unzipping packages and creating metadata.....
 mkdir -p ../unzipped/debs
 cp ../scripts/*.py ../unzipped/debs/
 cp ../scripts/*.xml ../unzipped/debs/
-cp ../scripts/mpkgs ../unzipped/
+if [ ! -f ../unzipped/mpkgs ]; then
+	cp ../scripts/mpkgs ../unzipped/
+fi
 for z in *.zip; do unzip -K -o -qq $z -d ../unzipped/debs/`basename $z .zip|tr A-Z a-z`/; done
 cd ../unzipped/debs
 mkdir -p ../../debug
@@ -29,6 +32,7 @@ python metadata.py $repofile > ../../debug/debug.txt
 ### END ######################################################################################
 
 ### 2. Preparing packages ########################
+echo 2/4: Preparing packages....
 for x in *; do
 	if [ -d ${x}/__MACOSX ]; then
 		rm -rf ${x}/__MACOSX
@@ -46,26 +50,27 @@ rm -f *.py *.pyc *.xml
 ### END ##########################################
 
 ### 3. Building packages and cleaning up ##############
+echo 3/4: Building packages and cleaning up
 for x in *; do dpkg -b $x 1>/dev/null 2>/dev/null; done
 ls -d * | grep -v .deb | xargs rm -rf
 cd ..
 ### END ###############################################
 
 ### 4. Creating Repository Info Files #################################################################################################################################
-mkdir -p indices
-touch indices/override
+echo 4/4: Creating Repository Info Files
 rm -f dists/stable/main/binary-darwin-arm/Packages*
 chmod +x mpkgs
 ./mpkgs debs indices/override | awk '{gsub("Section: Network\n","Section: Networking\n");print}' > dists/stable/main/binary-darwin-arm/Packages2
 cp dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages 
 gzip -9 -f dists/stable/main/binary-darwin-arm/Packages
 mv dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin-arm/Packages
+echo Exit Status: $?
 ### END #################################################################################################################################################################
-
 }
 
 first_run() {
 ### 1. Unzipping packages and creating metadata ##############################################
+echo 1/4: Unzipping packages and creating metadata.....
 mkdir -p ../unzipped/debs
 cp ../scripts/*.py ../unzipped/debs/
 cp ../scripts/*.xml ../unzipped/debs/
@@ -79,6 +84,7 @@ python metadata.py $repofile > ../../debug/debug.txt
 ### END ######################################################################################
 
 ### 2. Preparing packages ########################
+echo 2/4: Preparing packages....
 for x in *; do
 	if [ -d ${x}/__MACOSX ]; then
 		rm -rf ${x}/__MACOSX
@@ -97,12 +103,14 @@ rm -f *.py *.pyc *.xml
 
 
 ### 3. Building packages and cleaning up ##############
+echo 3/4: Building packages and cleaning up
 for x in *; do dpkg -b $x 1>/dev/null 2>/dev/null; done
 ls -d * | grep -v .deb | xargs rm -rf
 cd ..
 ### END ###############################################
 
 ### 4. Creating Repository Info Files #################################################################################################################################
+echo 4/4: Creating Repository Info Files
 mkdir -p indices
 touch indices/override
 
@@ -136,6 +144,7 @@ Architectures: darwin-arm
 Components: main
 Description: ${repodesc}
 END
+echo Exit Status: $?
 ### END #################################################################################################################################################################
 }
 
