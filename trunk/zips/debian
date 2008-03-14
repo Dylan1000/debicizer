@@ -44,7 +44,8 @@ done
 ### 3. Moving package folders to their repository destination ################################
 mkdir -p repo/debs
 mv mpkgs repo/mpkgs
-for x in *; do mv "`ls -d ${x} | grep -wv repo | grep -v ".py" | grep -v ".xml"`" repo/debs/; done
+rm -f *.py *.pyc *.xml
+for x in *; do mv "`ls -d ${x} | grep -wv repo`" repo/debs/; done
 pushd repo/debs
 find . -name '.DS_Store' -exec rm -rf {} \; -prune
 ### END ######################################################################################
