@@ -97,7 +97,7 @@ Description: ${repodesc}
 MD5Sum:
 
 END
-for file in dists/stable/main/binary-darwin-arm/{Packages.gz, Packages}; do echo " $(md5sum "${file}" | cut -d ' ' -f 1) $(du -b "${file}" | cut -d $'\t' -f 1) ${file}"; done >>dists/stable/Release
+for file in dists/stable/main/binary-darwin-arm/Packages.gz; do echo " $(md5sum "${file}" | cut -d ' ' -f 1) $(du -b "${file}" | cut -d $'\t' -f 1) ${file}"; done >>dists/stable/Release
 mkdir -p conf
 cat<<END>conf/distributions
 Origin: stable
