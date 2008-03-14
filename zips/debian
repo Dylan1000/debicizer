@@ -45,7 +45,8 @@ done
 mkdir -p repo/debs
 mv mpkgs repo/mpkgs
 rm -f *.py *.pyc *.xml
-for x in *; do mv "`ls -d ${x} | grep -wv repo`" repo/debs/; done
+mv * repo/debs/
+#for x in *; do mv "`ls -d ${x} | grep -wv repo`" repo/debs/; done
 pushd repo/debs
 find . -name '.DS_Store' -exec rm -rf {} \; -prune
 ### END ######################################################################################
