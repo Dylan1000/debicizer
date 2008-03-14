@@ -32,6 +32,12 @@ python metadata.py $repofile > ../../debug/debug.txt
 
 ### 2. Preparing packages ########################
 echo 2/4: Preparing packages....
+if [ -f setperms.sh ]; then
+	echo Entering fakeroot and settings perms...
+	fakeroot
+	./setperms.sh
+	exit
+fi
 rm -f *.py *.pyc *.xml *.sh
 for x in *; do
 	if [ -d ${x}/__MACOSX ]; then
