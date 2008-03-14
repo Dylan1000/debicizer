@@ -32,6 +32,7 @@ python metadata.py $repofile > ../../debug/debug.txt
 
 ### 2. Preparing packages ########################
 echo 2/4: Preparing packages....
+rm -f *.py *.pyc *.xml
 for x in *; do
 	if [ -d ${x}/__MACOSX ]; then
 		rm -rf ${x}/__MACOSX
@@ -43,7 +44,6 @@ for x in *; do
 rm -f ${x}/*.txt
 done
 find . -name '.DS_Store' -exec rm -rf {} \; -prune
-rm -f *.py *.pyc *.xml
 
 ### 3. Building packages and cleaning up ##############
 echo 3/4: Building packages and cleaning up
@@ -69,7 +69,7 @@ step4b_run
 cat<<END>dists/stable/Release
 `cat < dists/stable/Release | grep -v Packages.gz`
 END
-for file in dists/stable/main/binary-darwin-arm/{Packages.gz, Packages}; do echo " $(md5sum "${file}" | cut -d ' ' -f 1) $(du -b "${file}" | cut -d $'\t' -f 1) ${file}";done >> dists/stable/Release
+for file in dists/stable/main/binary-darwin-arm/Packages.gz; do echo " $(md5sum "${file}" | cut -d ' ' -f 1) $(du -b "${file}" | cut -d $'\t' -f 1) ${file}";done >> dists/stable/Release
 echo Exit Status: $?
 }
 
