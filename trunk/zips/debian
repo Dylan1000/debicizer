@@ -68,7 +68,7 @@ mv dists/stable/main/binary-darwin-arm/Packages2 dists/stable/main/binary-darwin
 
 update_repo() {
 fakeroot
-steps1_3_run
+steps1-3_run
 rm -f dists/stable/main/binary-darwin-arm/Packages*
 step4b_run
 cat<<END>dists/stable/Release
