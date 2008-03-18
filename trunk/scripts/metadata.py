@@ -16,6 +16,8 @@ import xml.sax
 from glob import glob
 import types
 import string
+from copy import deepcopy
+
 
 def plistToPython(file):
     """Creates a python structure from the passed plist file"""
@@ -132,7 +134,7 @@ def createControlFile(package):
     else:
 	print "entrando en controlfile"
         print "existe" + "../../zips/" + os.path.basename(valueForKey(package,'location'))
-        
+
     try:
         os.makedirs(PACKAGE_DIR % package_name(package))
     except OSError,a:
@@ -205,6 +207,56 @@ def closeFiles(package):
     print >>fp6, "exit"
     fp6.close()
     
+def deleteUpdate(update,theinstall,theuninstall,id,package):
+    print "start"
+    #theinstall=deepcopy(install)
+    theupdate=deepcopy(update)
+    print theupdate
+    print "the update"
+    print theinstall
+    print "the install"
+    print theuninstall
+    print "the uninstall"
+    print type(theupdate)
+    "----------------"
+    print theupdate
+    numbers=[]
+    for number,f in enumerate(theupdate):
+        #print f
+        print "es la f"
+        print str(f)
+        print "dentro"
+        #print str(theinstall[f])
+        
+        #print [f]
+        #print theinstall[0][f]
+        for x in theinstall:
+            print str(x)
+            if str(f) == str(x):
+                numbers.append(number)
+                #del theupdate[number]
+        for y in theuninstall:
+            print str(y)
+            if str(f) == str(y):
+                numbers.append(number)
+	#if f in theinstall:
+	#	if theupdate[f] == theinstall[f]:
+        #    del theupdate[f]
+            
+        #    print "ostia que esta!"
+    #print theinstall
+    print numbers
+    numbers.sort()
+    numbers.reverse()
+    print numbers
+    for z in numbers:
+        del theupdate[z]
+    print "fuera"
+    print "___________"
+    print theupdate
+    if len(theupdate) > 0:
+        parseUpdate(theupdate,id,package)
+    print "finished"
 
 def createInstallFiles(package):
     """Creates install and remove files containing the various information, retrieved from the 
@@ -230,16 +282,28 @@ def createInstallFiles(package):
 	#print a
         pass
     
+
     #operation="pre"
 	#os.makedirs(
     # Creating an empty install file
     prefix="pre"
+    
     test = valueForKey(package,'scripts')
+    #print "dfjkghdkjghdfkjghfdkjghdkjghdfkjghdfkjghdfkjghdfkj"
+    #print len(valueForKey(test,'update'))
+    #print len(valueForKey(test,'install'))
+    #print valueForKey(test,'update')
+    #print valueForKey(test,'install')
+    #deleteUpdate(valueForKey(test,'update'),valueForKey(test,'install'),valueForKey(test,'uninstall'),package_id(package),package)
+    #print "aqui estamos fuera"
+    #print valueForKey(test,'update')
+    #print valueForKey(test,'install')
     prepareFiles(package)
     print "".join(test) + " es estooooooooooo"
     global script
     global shellscript
     global directory
+    global operation
     shellscript = "script.sh"
     script = open(shellscript, "w")
     print package.keys()
@@ -247,6 +311,7 @@ def createInstallFiles(package):
     print package
     global directory
     directory=package_name(package)
+
     if test.has_key('preflight'):
         operation="inst"
         openFd()
@@ -256,6 +321,13 @@ def createInstallFiles(package):
         m=valueForKey(test,'preflight')
         print m
         parsepreflight(m)
+    if test.has_key('update'):
+        print "te odiooooooooooooo"
+        operation="inst"
+        m=valueForKey(test,'update')
+        print m
+        #parseUpdate(m,package_id(package),package)
+        deleteUpdate(valueForKey(test,'update'),valueForKey(test,'install'),valueForKey(test,'uninstall'),package_id(package),package)
         #dsdadad
     if test.has_key('install'):
 
@@ -310,6 +382,68 @@ def createInstallFiles(package):
 #                       k = valueForKey(test,'uninstall')
                         #generateShell(k)
 
+
+def parseUpdate(algo,id,package):
+    global fd
+    global prefix
+    global operation
+    global directory
+    print prefix + operation
+    print "que hay aqui"
+    print algo
+    openFd()
+    #openFd()
+    print >>fd, "if [[ $1 = \"upgrade\" ]]; then"
+    for p in algo:
+        #print "el for"
+        #print p[0]
+        if p[0]=="IfNot":
+            print "es un ifnot"    
+        elif p[0]=="RemovePath":
+            print "es un RemovePath"
+            print p
+            for lala in p:
+                if lala != "RemovePath":
+                    print lala
+                    print >>fd, "if [ ! $(dpkg-query -S \"" + lala + "\"| grep -c " + id + ") ]; then"
+                    print >>fd, "rm -rf \"" + lala + "\""
+                    print >>fd, "fi"
+        elif p[0]=="CopyPath":
+            print "es un CopyPath"
+            print p[1]
+            print p[2]
+            print directory
+            #os.system("pwd")
+            #os.system("mkdir -p " + directory + "/fuck/unzip")
+            #os.system("unzip -K -o -qq ../../zips/" + os.path.basename(valueForKey(package,'location'))+ " -d " + directory + "/fuck/unzip")
+            #os.system("find " + directory + "/fuck/unzip/" + p[1] + " >" + directory + "/fuck/1.txt")
+            #os.system("find "+ directory + p[2] + " >" + directory + "/fuck/2.txt")
+            #os.system("cat " + directory + "/fuck/1.txt | sed 's/" + directory + "\/fuck\/unzip//g' >" +  directory + "/fuck/3.txt")
+            #os.system("cat " + directory + "/fuck/2.txt | sed 's/" + directory + "//g' >" +  directory + "/fuck/4.txt")
+            #os.system("diff -u " + directory + "/fuck/3.txt " + directory + "/fuck/4.txt >" + directory + "/fuck/diff.txt")
+            #fp2 = popen("cat %s/fuck/diff.txt | wc -l" % directory)
+            #try:
+            #    size = fp2.read().strip()
+            #    size = int(size)
+            #except:
+            #    size = 0
+            #fp2.close()
+            #if (size!=0):
+            #    print size 
+            
+            #fdsfdsfsdf
+            #if  not os.path.exists(directory + os.path.basename(valueForKey(package,'location'))):
+        elif p[0]=="InstallApp":
+            print "ignoring installapp"
+            #print "es un InstallApp"
+        elif p[0]=="UninstallApp":
+            #print "es un UninstallApp"
+            print "ignoring uninstallapp"
+    #print >>fd, "if [ $(dpkg -l|grep ^ii|awk '{print $2}'| grep -c ^" + p[1][0][1] + " $) -ne 1]; then"
+    print >>fd, "fi"
+
+    
+
 def parserPostflight(algo):
     
     print "es el post flight"
@@ -347,6 +481,7 @@ def parsepreflight(algo):
     print type(algo)
     print "en el preflight"
     for p in algo:
+        #unHome(p)
         parser(p)
         #print p
         #print p[0]
@@ -367,14 +502,14 @@ def parser(IF):
     print IF
     print "es el parser"
     print IF
-    
+    #unHome(IF)
     temp=[]
     if IF[0]=="IfNot":
         if IF[1][0][0]=="FirmwareVersionIs":
             for k in IF[1][0][1]:
                 #print k
                 print "sera la version?"
-                temp.append("firmware (="+ k + ")")
+                temp.append("firmware (= "+ k + ")")
                 #types.StringTypes.
                 
                 #temp.append("firmware("+ k + ")")
@@ -461,6 +596,7 @@ def parseExec(line,dir):
     print line + " es la linea"
     print line
     print type(line)
+    #unHome(line)
     splitedline=line.split()
     print splitedline
     #if splitedline[0] == "/bin/mkdir":
@@ -529,7 +665,52 @@ def closeFd():
     global fd
     #print type(fd)
     fd.close()
+
+#def unHome(thing):
+#    global depends
+#    global h
+#    global o
+#    #global thing
+#    print "replacing"
+#    print type(thing)
+#    print thing
+#    thing
+#    try:
+#        if (thing.find('/var/mobile')>-1):
+#            thing=thing.replace( '/var/mobile', '/User' )
+#            depends.append('firmware')
+#        if (thing.find('~')>-1):    
+#    
+#            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+#            thing=thing.replace( '~', '/User' )
+#            depends.append('firmware')
+#            print thing
+#            dsfgdfsddfgdfds
+#        #if (o.find('/var/mobile')>-1):
+#        #    o=o.replace( '/var/mobile', '/User' )
+#        #    depends.append('firmware')
+#    except AttributeError:
+#        for lplp in thing:
+#            unHome(lplp)
+#    print thing
+#    print "limpiado"
+#    return thing
+
+def unHome(thing):
+    global depends
+    try:
+        if (thing.find('/var/mobile')>-1):
+            thing=thing.replace( '/var/mobile', '/User' )
+            depends.append('firmware')
+        if (thing.find('~')>-1):    
     
+            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            thing=thing.replace( '~', '/User' )
+            depends.append('firmware')
+    except AttributeError:
+        for lplp in thing:
+            unHome(lplp)
+    return thing
 
 def generateShell(file,dir,n):
 	#name of the directory of the app 
@@ -545,7 +726,7 @@ def generateShell(file,dir,n):
         global directory
         #directory=dir
 	global prefix
-        
+        global h
         
         archivo=dir + "/DEBIAN/" + prefix + operation
         print archivo
@@ -555,13 +736,80 @@ def generateShell(file,dir,n):
         global depends        
         #global operation
         fd = open(archivo, "a")
-        
+        global h
 	print prefix
         print operation
         flagForCopyPath=0
         flagForRemovePath=0
         
 	for h in file:
+                try: 
+                    h = [item.replace('/var/mobile', '/User') for item in h]
+                    h = [item.replace('~', '/User') for item in h]
+                    
+                except AttributeError:
+                    print h
+                    print "me cago en tus muertos"
+#                    j.replace('~', '/User')
+                #try:
+                #    if (h.find('/var/mobile')>-1):
+                #        h=h.replace( '/var/mobile', '/User' )
+                #        depends.append('firmware')
+                #    if (h.find('~')>-1):    
+                #
+                #        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                #        h=h.replace( '~', '/User' )
+                #        depends.append('firmware')
+                #except AttributeError:
+                #    for lplp in h:
+                #        try:
+                #            if (lplp.find('/var/mobile')>-1):
+                #                lplp=lplp.replace( '/var/mobile', '/User' )
+                #                depends.append('firmware')
+                #            if (lplp.find('~')>-1):    
+                #
+                #                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                #                lplp=lplp.replace( '~', '/User' )
+                #                depends.append('firmware')
+                #        except AttributeError:
+                #            for lyly in lplp:
+                #                try:
+                #                    if (lyly.find('/var/mobile')>-1):
+                #                        lyly=lyly.replace( '/var/mobile', '/User' )
+                #                        depends.append('firmware')
+                #                    if (lyly.find('~')>-1):    
+                #
+                #                        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                #                        lyly=lyly.replace( '~', '/User' )
+                #                        depends.append('firmware')
+                #                except AttributeError:
+                #                    for lulu in lyly:
+                #                        if (lulu.find('/var/mobile')>-1):
+                #                            lulu=lulu.replace( '/var/mobile', '/User' )
+                #                            depends.append('firmware')
+                #                        if (lulu.find('~')>-1):    
+                #    
+                #                            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                #                            lulu=lulu.replace( '~', '/User' )
+                #                            depends.append('firmware')
+                                    
+                                
+                #unHome(h)
+                #print "blablabla"
+                #print h
+                
+                #for o in h:
+                    
+                        
+                #        print type(o)
+                #        if (o.find('~')>-1):    
+
+                #            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                #            o=o.replace( '~', '/User' )
+                #            depends.append('firmware')
+                #        elif (o.find('/var/mobile')>-1):
+                #            o=o.replace( '/var/mobile', '/User' )
+                #            depends.append('firmware')
 		if h[0] == "CopyPath": #h[1] origen h[2]destino
                             #unlockfiles    /usr/bin
                             #Info.plist     /Applications/MobileAddressBook.app/Info.plist //Contacts.zip
@@ -569,7 +817,7 @@ def generateShell(file,dir,n):
                                     
 			#print >>fd, "cp -pR \"../" + h[1] + "\" \"" + h[2] + "\""
 			#if
-                        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                        #print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
                         insidecontent=0
                         if h[1].endswith('/'):
@@ -580,17 +828,17 @@ def generateShell(file,dir,n):
                         
                         print h[2]
                         print h[2].find('~')
-                        if (h[2].find('~')>-1):    
+                        #if (h[2].find('~')>-1):    
 
-                            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                            h[2]=h[2].replace( '~', '/User' )
-                            depends.append('firmware')
-                        elif (h[2].find('/var/mobile')>-1):
-                            h[2]=h[2].replace( '/var/mobile', '/User' )
-                            depends.append('firmware')
-                        else:
-                            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                            print "is sux"
+                        #    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                        #    h[2]=h[2].replace( '~', '/User' )
+                        #    depends.append('firmware')
+                        #elif (h[2].find('/var/mobile')>-1):
+                        #    h[2]=h[2].replace( '/var/mobile', '/User' )
+                        #    depends.append('firmware')
+                        #else:
+                        #    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                        #    print "is sux"
                             
                             
                         
@@ -701,7 +949,9 @@ def generateShell(file,dir,n):
                 if h[0] == "RemovePath":
                     for j in h:
                         if j != "RemovePath":
-                            j=j.replace( '~', '/var/mobile' )
+                            #unHome(j)
+                            print j
+                            #j=j.replace( '~', '/var/mobile' )
                             if not os.path.exists(dir + j):
                                print >>fd, "rm -rf \"" + j + "\""
                             else:
@@ -719,7 +969,7 @@ def generateShell(file,dir,n):
                             #os.system("cat " + POSTINSTALL_PATH % file)
                             fd = open(archivo, "a")
                             flagForRemovePath=0
-                        
+                            
                         #print "borrar " + h[1]
                 if h[0] == "Exec":
                     #print "vamos a ver el exec"
@@ -828,6 +1078,10 @@ repo = plist['info']
 globals()['repo']
 # Holds a reference to the packages list
 packages = plist['packages']
+titit=repo.copy()
+#print packages
+
+
 #print packages
 #print "these are packages"
 global j

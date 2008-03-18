@@ -170,7 +170,7 @@ packages = plist['packages']
 
 for p in packages:
 
-	if  not os.path.exists("../zips/" + os.path.basename(valueForKey(p,'location'))+".done"):
+	if  not os.path.exists("../../zips/" + os.path.basename(valueForKey(p,'location'))+".done"):
 		os.system("mkdir " + package_name(p))
 
-		os.system("unzip -o -qq ../zips/" + os.path.basename(p['location']) + " -d " + package_name(p)) 		
+		os.system("unzip -o -qq ../../zips/" + os.path.basename(p['location']) + " -d " + package_name(p)) 		
