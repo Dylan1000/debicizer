@@ -35,9 +35,14 @@ def plistToPython(file):
 def package_name(package):
     """Recevies a filename and extracts the package name from it"""
     file = os.path.basename(package['location'])
+    #if not os.path.exists("downloader"):
     if not file.endswith('.zip'):
         return file.lower()
     return file[0:file.rfind('.zip')].lower()
+    #else:
+    #    if not file.endswith('.zip'):
+    #        return file.lower()+"-down"
+    #    return file[0:file.rfind('.zip')].lower()+"-down"
     
 def get_size(package):
     if not os.path.exists("%s" % package_name(package)):
