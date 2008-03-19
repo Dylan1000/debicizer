@@ -749,7 +749,8 @@ def generateShell(file,dir,n):
                     
                 except AttributeError:
                     print h
-                    print "me cago en tus muertos"
+                    #print "me cago en tus muertos"
+                    
 #                    j.replace('~', '/User')
                 #try:
                 #    if (h.find('/var/mobile')>-1):
