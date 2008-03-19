@@ -16,7 +16,7 @@ cd zips
 
 ./debian firstrun installer.xml "Repo Description" (note the quotes)
 
-Currently generates broken debs and paths are hardcoded
+Currently paths are hardcoded
 
 
 Command Lines
