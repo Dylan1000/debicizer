@@ -19,7 +19,7 @@ cd zips
 Currently paths are hardcoded
 
 -----------------
-in scripts/test you can found a lala.py ( use this not scripts scripts/lala.py for the hardcoded paths)
+in scripts/test you can found a lala.py ( use this not scripts for the hardcoded paths)
 
 lala.py execution:
 
