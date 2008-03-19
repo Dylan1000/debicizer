@@ -18,6 +18,21 @@ cd zips
 
 Currently paths are hardcoded
 
+-----------------
+in scripts/test you can found a lala.py ( use this not scripts scripts/lala.py for the hardcoded paths)
+
+lala.py execution:
+
+it need the zip files of the repo in the same place zips/
+
+
+python lala.py url_of_the_xml_repo_file
+
+it generates the folders to send to dpkg -b command
+
+
+
+
 
 Command Lines
 needs to be executed from unzipped dir and it cleans the unzipped folder and reunzip only zip files from the xml and after makes the metadata
