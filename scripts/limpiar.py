@@ -171,8 +171,8 @@ packages = plist['packages']
 for p in packages:
 
 	if  not os.path.exists("../../zips/" + os.path.basename(valueForKey(p,'location'))+".done"):
-            if  not os.path.exists("../../zips/" + os.path.basename(valueForKey(package,'location'))):
-                print "no existe" + "../../zips/" + os.path.basename(valueForKey(package,'location'))
+            if  not os.path.exists("../../zips/" + os.path.basename(valueForKey(p,'location'))):
+                print "no existe" + "../../zips/" + os.path.basename(valueForKey(p,'location'))
             else:
 		os.system("mkdir " + package_name(p))
 
