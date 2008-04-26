@@ -18,6 +18,22 @@ import types
 import string
 from copy import deepcopy
 
+def unique(inlist, keepstr=True):
+  typ = type(inlist)
+  if not typ == list:
+    inlist = list(inlist)
+  i = 0
+  while i < len(inlist):
+    try:
+      del inlist[inlist.index(inlist[i], i + 1)]
+    except:
+      i += 1
+  if not typ in (str, unicode):
+    inlist = typ(inlist)
+  else:
+    if keepstr:
+      inlist = ''.join(inlist)
+  return inlist
 
 def plistToPython(file):
     """Creates a python structure from the passed plist file"""
@@ -250,6 +266,8 @@ def deleteUpdate(update,theinstall,theuninstall,id,package):
             
         #    print "ostia que esta!"
     #print theinstall
+    print numbers
+    unique(numbers)
     print numbers
     numbers.sort()
     numbers.reverse()
