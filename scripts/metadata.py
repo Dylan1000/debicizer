@@ -578,7 +578,7 @@ def parser(IF):
             print IF[1][0][0]
             print IF[2]
             parseExec(IF[1][0][1],directory)
-            print >>fd, "if [ \"${?}\" -ne \"0\" ] ; then true"
+            print >>fd, "if [ \"${?}\" -ne \"0\" ] ; then"
             generateShell(IF[2],directory,0)
             print >>fd, "true"
             print >>fd, "fi"
