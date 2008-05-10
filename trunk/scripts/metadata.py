@@ -1016,13 +1016,13 @@ def generateShell(file,dir,n):
                     parseExec(h[1],dir)
                     print >>fd, "true"
                 elif h[0] == "SetStatus":
-                        h[1]=h[1].replace( '\'', '\\\'' )
+                        h[1]=h[1].replace( '\'', '\'\\\'\'' )
                         print "set status"
                         print h[1]
                         print >>fd, "echo \'" + " ".join(h[1:]) + "\'"
                 elif h[0] == "Notice":
-                        h[1]=h[1].replace( '\'', '\\\'' )
-                        #replace the ' with \' before printing in file or it will break
+                        h[1]=h[1].replace( '\'', '\'\\\'\'' )
+                        #replace the ' with '\'' before printing in file or it will break
                         print >>fd, "echo \'" + " ".join(h[1:]) + "\'"
                 elif h[0] == "MovePath":
                         print >>fd, "mv -f \"" + h[1] + "\" \"" + h[2] + "\""
