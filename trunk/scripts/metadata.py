@@ -416,7 +416,7 @@ def parseUpdate(algo,id,package):
     print algo
     openFd()
     #openFd()
-    print >>fd, "if [[ $1 = \"upgrade\" ]]; then"
+    print >>fd, "if [[ $1 = \"upgrade\" ]]; then true"
     for p in algo:
         #print "el for"
         #print p[0]
@@ -483,7 +483,7 @@ def parserPostflight(algo):
         if p[0]=="IfNot":
             print p[1]
             if p[1][0][0]=="InstalledPackage":
-                print >>fd, "if [ $(dpkg -l|grep ^ii|awk '{print $2}'| grep -c ^" + p[1][0][1] + "$) -ne 1]; then"
+                print >>fd, "if [ $(dpkg -l|grep ^ii|awk '{print $2}'| grep -c ^" + p[1][0][1] + "$) -ne 1]; then true"
                 #test=[[u"CopyPath",splitedline[1],splitedline[2]]]
                 generateShell(p[2],directory,0)
                 print >>fd, "fi"
@@ -578,7 +578,7 @@ def parser(IF):
             print IF[1][0][0]
             print IF[2]
             parseExec(IF[1][0][1],directory)
-            print >>fd, "if [ \"${?}\" -ne \"0\" ] ; then"
+            print >>fd, "if [ \"${?}\" -ne \"0\" ] ; then true"
             generateShell(IF[2],directory,0)
             print >>fd, "true"
             print >>fd, "fi"
@@ -1035,7 +1035,7 @@ def generateShell(file,dir,n):
                         	print "es una lista vamos a mirar que es"
                                 print h[1][0][0]
                                 if h[1][0][0]=="ExistsPath":
-                                        print >>fd, "if [ -e \"" + h[1][0][1] +"\" ]; then"
+                                        print >>fd, "if [ -e \"" + h[1][0][1] +"\" ]; then true"
                                         #print "test the existance"
 					fd.flush()
                                         temp=h[2]
